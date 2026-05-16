@@ -11,7 +11,7 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 export function PublicHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-sm">
-      <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
         {/* 左侧：Logo + 导航 */}
         <nav className="flex items-center gap-6">
           <Link

@@ -11,7 +11,7 @@ export function PublicFooter() {
 
   return (
     <footer className="border-t border-border bg-background">
-      <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4 text-xs text-muted-foreground sm:px-6">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 text-xs text-muted-foreground sm:px-6">
         <span>
           &copy; {currentYear} {SITE_NAME}. All rights reserved.
         </span>

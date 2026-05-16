@@ -100,7 +100,7 @@ export function HeroSection() {
       </div>
 
       {/* 主内容 */}
-      <div className="relative z-10 mx-auto max-w-3xl px-4 py-20 sm:px-6 sm:py-28">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
         {/* 小标签 */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}

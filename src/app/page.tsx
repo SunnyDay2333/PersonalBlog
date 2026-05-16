@@ -40,7 +40,7 @@ export default async function HomePage() {
       <main className="flex-1">
         <HeroSection />
 
-        <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+        <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <div className="mb-10 flex items-center gap-4">
             <span className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
             <h2 className="shrink-0 text-sm font-medium tracking-wide text-muted-foreground uppercase">

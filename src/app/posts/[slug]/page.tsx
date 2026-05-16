@@ -94,8 +94,8 @@ export default async function PostPage({
               {/* 头部 */}
               <PostHeader post={post} />
 
-              {/* Markdown 正文 */}
-              <div className="mt-10">
+              {/* Markdown 正文（max-w-[720px] 约束阅读宽度） */}
+              <div className="mt-10 mx-auto max-w-[720px]">
                 <PostContent content={post.content} />
               </div>
 
