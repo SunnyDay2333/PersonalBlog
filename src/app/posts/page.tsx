@@ -8,8 +8,7 @@
 import type { Metadata } from "next";
 import { PublicHeader } from "@/components/layout/public-header";
 import { PublicFooter } from "@/components/layout/public-footer";
-import { ArchiveMain } from "./archive-main";
-import { ArchiveSidebar } from "./archive-sidebar";
+import { ArchiveFilterClient } from "./archive-filter-client";
 import { EmptyState } from "@/components/shared/empty-state";
 import { SITE_NAME } from "@/lib/constants";
 import type { Post } from "@/types/post";
@@ -53,10 +52,7 @@ export default async function PostsPage() {
             description="博主正在酝酿灵感，敬请期待。"
           />
         ) : (
-          <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
-            <ArchiveMain posts={posts} />
-            <ArchiveSidebar posts={posts} />
-          </div>
+          <ArchiveFilterClient posts={posts} />
         )}
       </main>
 

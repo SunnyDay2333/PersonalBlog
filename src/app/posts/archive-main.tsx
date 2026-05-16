@@ -32,9 +32,11 @@ function fmtDate(iso: string): string {
 
 interface ArchiveMainProps {
   posts: Post[];
+  /** 搜索无结果时的空状态提示；为空时不显示特殊空状态 */
+  emptyMessage?: string;
 }
 
-export function ArchiveMain({ posts }: ArchiveMainProps) {
+export function ArchiveMain({ posts, emptyMessage }: ArchiveMainProps) {
   const grouped = groupPostsByYear(posts);
   const years = [...grouped.keys()].sort((a, b) => b - a);
   let globalIndex = 0;
@@ -46,8 +48,22 @@ export function ArchiveMain({ posts }: ArchiveMainProps) {
       transition={{ duration: 0.6 }}
       className="rounded-3xl border border-border bg-card p-6 sm:p-8"
     >
-      {/* 页面标题 */}
-      <div className="mb-8 flex items-baseline justify-between">
+      {/* 搜索空状态 */}
+      {posts.length === 0 && emptyMessage && (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <p className="text-lg font-medium text-muted-foreground">
+            {emptyMessage}
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground/60">
+            试试其他关键词
+          </p>
+        </div>
+      )}
+
+      {/* 页面标题 + 列表（仅在有文章时显示） */}
+      {posts.length > 0 && (
+        <>
+          <div className="mb-8 flex items-baseline justify-between">
         <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
           文章总览
           <span className="ml-2 text-2xl text-muted-foreground font-normal">
@@ -130,6 +146,8 @@ export function ArchiveMain({ posts }: ArchiveMainProps) {
           </div>
         ))}
       </div>
+        </>
+      )}
     </motion.section>
   );
 }
