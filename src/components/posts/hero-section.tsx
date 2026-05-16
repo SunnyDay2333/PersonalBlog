@@ -44,11 +44,30 @@ export function HeroSection() {
     <section
       ref={sectionRef}
       onMouseMove={handleMouseMove}
-      className="relative overflow-hidden border-b border-border bg-background"
+      className="relative overflow-hidden border-b border-border"
     >
+      {/* 背景壁纸 */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `url('/hero-bg.jpg')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+        aria-hidden
+      />
+
+      {/* 半透明白色遮罩 — 保护文字对比度 */}
+      <div
+        className="absolute inset-0 z-[1]"
+        style={{ backgroundColor: "rgba(255, 255, 255, 0.6)" }}
+        aria-hidden
+      />
+
       {/* 光标跟随聚光灯 */}
       <div
-        className="pointer-events-none absolute inset-0 z-0 select-none"
+        className="pointer-events-none absolute inset-0 z-[2] select-none"
         aria-hidden
       >
         <div
@@ -62,14 +81,14 @@ export function HeroSection() {
       </div>
 
       {/* 固定色晕底座 */}
-      <div className="pointer-events-none absolute inset-0 select-none">
+      <div className="pointer-events-none absolute inset-0 z-[2] select-none">
         <div className="absolute -top-40 -right-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#425AEF]/10 to-transparent blur-3xl" />
         <div className="absolute -bottom-40 -left-32 h-[450px] w-[450px] rounded-full bg-gradient-to-tr from-violet-500/10 to-transparent blur-3xl" />
         <div className="absolute top-1/4 left-1/3 h-[250px] w-[250px] rounded-full bg-gradient-to-br from-cyan-400/5 to-pink-400/5 blur-3xl" />
       </div>
 
       {/* 浮动 emoji（带辉光） */}
-      <div className="pointer-events-none absolute inset-0 hidden select-none sm:block">
+      <div className="pointer-events-none absolute inset-0 z-[2] hidden select-none sm:block">
         {FLOATING_EMOJIS.map((item, i) => (
           <motion.span
             key={i}
