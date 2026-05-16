@@ -30,7 +30,7 @@ function slugify(text: string): string {
     .replace(/^-|-$/g, "");
 }
 
-/** 从 Markdown 提取 h2~h4 */
+/** 从 Markdown 提取 h1~h4 */
 function extractToc(markdown: string): TocItem[] {
   const items: TocItem[] = [];
   const lines = markdown.split("\n");
@@ -43,7 +43,7 @@ function extractToc(markdown: string): TocItem[] {
     }
     if (inCodeBlock) continue;
 
-    const match = /^(#{2,4})\s+(.+?)\s*#*\s*$/.exec(line);
+    const match = /^(#{1,4})\s+(.+?)\s*#*\s*$/.exec(line);
     if (match) {
       items.push({
         level: match[1].length,
@@ -184,11 +184,13 @@ export function PostToc({ content }: PostTocProps) {
             }
 
             const indent =
-              item.level === 2
-                ? "pl-2"
-                : item.level === 3
-                  ? "pl-6"
-                  : "pl-10";
+              item.level === 1
+                ? "pl-0 font-medium"
+                : item.level === 2
+                  ? "pl-2"
+                  : item.level === 3
+                    ? "pl-6"
+                    : "pl-10";
 
             return (
               <a
