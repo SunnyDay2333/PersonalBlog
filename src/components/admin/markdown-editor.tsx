@@ -5,6 +5,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import ImageExtension from "@tiptap/extension-image";
 import { InlineMath, BlockMath } from "@tiptap/extension-mathematics";
 import { mergeAttributes, InputRule } from "@tiptap/core";
 import { common, createLowlight } from "lowlight";
@@ -547,6 +548,10 @@ export function MarkdownEditor({ content, onChange }: MarkdownEditorProps) {
           class: "code-block",
         },
       }),
+      ImageExtension.configure({
+        inline: true,
+        allowBase64: true,
+      }),
       CustomInlineMath.configure({
         katexOptions: {
           displayMode: false,
@@ -691,8 +696,8 @@ export function MarkdownEditor({ content, onChange }: MarkdownEditorProps) {
       // 改动点 3：纯图片粘贴（截图 / 文件复制，无 HTML 无文本）
       if (!html && !plain && hasImageBlobs) {
         const urls = await uploadImagesToStorage(imageItems, supabase);
-        const md = urls.map((url) => `![](${url})`).join("\n\n");
-        editor.commands.insertContent(md);
+        const imgs = urls.map((url) => `<img src="${url}" alt="">`).join("\n");
+        editor.chain().focus().insertContent(imgs).run();
         return;
       }
 
@@ -842,7 +847,7 @@ export function MarkdownEditor({ content, onChange }: MarkdownEditorProps) {
         const ext = file.name.split(".").pop() || "png";
         const [url] = await uploadImagesToStorage([{ blob: file, ext }], supabase);
 
-        editor.chain().focus().insertContent(`![${file.name}](${url})`).run();
+        editor.chain().focus().insertContent(`<img src="${url}" alt="${file.name}">`).run();
         toast.success("图片已上传");
       } catch {
         toast.error("图片上传失败");
