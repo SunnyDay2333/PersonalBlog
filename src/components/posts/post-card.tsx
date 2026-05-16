@@ -65,7 +65,7 @@ function PostCardGrid({ post }: { post: Post }) {
   return (
     <Link
       href={`/posts/${post.slug}`}
-      className="group relative flex flex-col rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#425AEF]/30 hover:shadow-lg hover:shadow-[#425AEF]/5"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#425AEF]/30 hover:shadow-lg hover:shadow-[#425AEF]/5"
     >
       {/* hover 顶部渐变指示条 */}
       <span className="absolute inset-x-0 top-0 h-[3px] rounded-t-2xl bg-gradient-to-r from-[#425AEF] to-violet-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
