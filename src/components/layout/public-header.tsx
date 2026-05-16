@@ -1,0 +1,42 @@
+"use client";
+
+// ============================================================
+// 公共端（C 端）顶部导航栏
+// 包含站点 Logo、导航链接、主题切换按钮
+// ============================================================
+
+import Link from "next/link";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+
+export function PublicHeader() {
+  return (
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-sm">
+      <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4 sm:px-6">
+        {/* 左侧：Logo + 导航 */}
+        <nav className="flex items-center gap-6">
+          <Link
+            href="/"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            主页
+          </Link>
+          <Link
+            href="/posts"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            文章
+          </Link>
+          <Link
+            href="/about"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            关于
+          </Link>
+        </nav>
+
+        {/* 右侧：主题切换 */}
+        <ThemeToggle />
+      </div>
+    </header>
+  );
+}
