@@ -479,6 +479,40 @@ function preprocessMathInMarkdown(md: string): string {
   return result;
 }
 
+/** Blob → Base64 data URL（上传失败时的降级方案） */
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+/** 上传图片到 Supabase Storage，返回公开 URL 数组。单张失败降级 Base64 */
+async function uploadImagesToStorage(
+  items: { blob: Blob; ext: string }[],
+  supabase: ReturnType<typeof createClient>,
+): Promise<string[]> {
+  const results = await Promise.all(
+    items.map(async ({ blob, ext }) => {
+      try {
+        const fileName = `paste-${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${ext}`;
+        const { data, error } = await supabase.storage
+          .from("article-images")
+          .upload(fileName, blob, { contentType: `image/${ext}`, upsert: true });
+        if (error) throw error;
+        return supabase.storage
+          .from("article-images")
+          .getPublicUrl(data.path).data.publicUrl;
+      } catch {
+        return blobToBase64(blob);
+      }
+    }),
+  );
+  return results;
+}
+
 interface MarkdownEditorProps {
   content: string;
   onChange: (markdown: string) => void;
@@ -632,104 +666,74 @@ export function MarkdownEditor({ content, onChange }: MarkdownEditorProps) {
       const plain = e.clipboardData?.getData("text/plain") || "";
       const items = e.clipboardData?.items;
 
-      // 检查是否包含本地图片（HTML 中的 <img> 或 Markdown 中的 ![...](...)）
-      const hasLocalImages =
-        (html && /<img[^>]+src="(?!https?:\/\/|data:)[^"]+"/i.test(html)) ||
-        (plain && /!\[.*?\]\((?!https?:\/\/|data:)[^)]+\)/.test(plain));
+      // 提取剪贴板中所有图片 Blob（改动点 1+2：以 Blob 为准，覆盖纯截图场景）
+      const imageItems: { blob: Blob; ext: string }[] = [];
+      if (items) {
+        for (const item of items) {
+          if (item.type.startsWith("image/")) {
+            const blob = item.getAsFile();
+            if (blob) {
+              imageItems.push({ blob, ext: item.type.split("/")[1] || "png" });
+            }
+          }
+        }
+      }
+      const hasImageBlobs = imageItems.length > 0;
 
       // 检查是否需要预处理数学公式
       const hasMathFormulas = /\$(?=[^$\s\\])[^$\n]+?\$(?!\d|\$)/.test(plain);
 
-      if (!hasLocalImages && !hasMathFormulas) return; // 无需处理，走默认粘贴
+      if (!hasImageBlobs && !hasMathFormulas) return; // 无需处理，走默认粘贴
 
       e.preventDefault();
       e.stopPropagation();
 
+      // 改动点 3：纯图片粘贴（截图 / 文件复制，无 HTML 无文本）
+      if (!html && !plain && hasImageBlobs) {
+        const urls = await uploadImagesToStorage(imageItems, supabase);
+        const md = urls.map((url) => `![](${url})`).join("\n\n");
+        editor.commands.insertContent(md);
+        return;
+      }
+
       let processedHtml = html;
       let processedPlain = plain;
 
-      // ---- 图片处理：上传到 Supabase Storage ----
-      if (hasLocalImages && items && items.length > 0) {
-        const imageItems: { blob: Blob; ext: string }[] = [];
-        for (let i = 0; i < items.length; i++) {
-          const item = items[i];
-          if (item.type.startsWith("image/")) {
-            const ext = item.type.split("/")[1] || "png";
-            const blob = item.getAsFile();
-            if (blob) imageItems.push({ blob, ext });
-          }
-        }
+      // ---- 图片上传 ----
+      if (hasImageBlobs) {
+        const uploadedUrls = await uploadImagesToStorage(imageItems, supabase);
 
-        if (imageItems.length > 0) {
-          const uploadedUrls: string[] = [];
+        // 替换 HTML 中本地 src
+        let imgIndex = 0;
+        processedHtml = processedHtml.replace(
+          /<img[^>]*src="(?!https?:\/\/|data:)([^"]*)"[^>]*>/gi,
+          (fullMatch) => {
+            const url = uploadedUrls[imgIndex] || uploadedUrls[uploadedUrls.length - 1];
+            imgIndex++;
+            return fullMatch.replace(/src="(?!https?:\/\/|data:)[^"]*"/i, `src="${url}"`);
+          },
+        );
 
-          for (const { blob, ext } of imageItems) {
-            try {
-              const fileName = `paste-${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${ext}`;
-              const { data, error } = await supabase.storage
-                .from("article-images")
-                .upload(fileName, blob, {
-                  contentType: `image/${ext}`,
-                  upsert: true,
-                });
-
-              if (error) throw error;
-
-              const publicUrl = supabase.storage
-                .from("article-images")
-                .getPublicUrl(data.path).data.publicUrl;
-
-              uploadedUrls.push(publicUrl);
-            } catch {
-              // 上传失败时降级为 Base64
-              const reader = new FileReader();
-              const base64 = await new Promise<string>((resolve) => {
-                reader.onload = () => resolve(reader.result as string);
-                reader.readAsDataURL(blob);
-              });
-              uploadedUrls.push(base64);
-            }
-          }
-
-          // 替换 HTML 中本地 src
-          let imgIndex = 0;
-          processedHtml = processedHtml.replace(
-            /<img[^>]*src="(?!https?:\/\/|data:)([^"]*)"[^>]*>/gi,
-            (fullMatch) => {
-              const url = uploadedUrls[imgIndex] || uploadedUrls[uploadedUrls.length - 1];
-              imgIndex++;
-              return fullMatch.replace(
-                /src="(?!https?:\/\/|data:)[^"]*"/i,
-                `src="${url}"`,
-              );
-            },
-          );
-
-          // 替换纯文本中 Markdown 图片语法本地路径
-          let mdImgIndex = 0;
-          processedPlain = processedPlain.replace(
-            /!\[([^\]]*)\]\((?!https?:\/\/|data:)([^)]+)\)/g,
-            (fullMatch, alt) => {
-              const url = uploadedUrls[mdImgIndex] || uploadedUrls[uploadedUrls.length - 1];
-              mdImgIndex++;
-              return `![${alt}](${url})`;
-            },
-          );
-        }
+        // 替换纯文本中 Markdown 图片语法本地路径
+        let mdImgIndex = 0;
+        processedPlain = processedPlain.replace(
+          /!\[([^\]]*)\]\((?!https?:\/\/|data:)([^)]+)\)/g,
+          (_, alt) => {
+            const url = uploadedUrls[mdImgIndex] || uploadedUrls[uploadedUrls.length - 1];
+            mdImgIndex++;
+            return `![${alt}](${url})`;
+          },
+        );
       }
 
-      // ---- 数学公式处理：将 $...$ / $$...$$ 转为 math 节点 HTML ----
+      // ---- 数学公式处理 ----
       if (hasMathFormulas) {
         processedPlain = preprocessMathInMarkdown(processedPlain);
       }
 
-      // ---- 插入处理后的内容 ----
+      // 改动点 7：直接插入 HTML，删除 HTML→Turndown→marked 冗余往返
       if (processedHtml) {
-        // 先解析 HTML（可能已含数学节点 HTML），再插入
-        const md = turndown.turndown(processedHtml);
-        const rePreprocessed = preprocessMathInMarkdown(md);
-        const finalHtml = marked.parse(rePreprocessed, { async: false }) as string;
-        editor.commands.insertContent(finalHtml);
+        editor.commands.insertContent(processedHtml);
       } else if (processedPlain) {
         const finalHtml = marked.parse(processedPlain, { async: false }) as string;
         editor.commands.insertContent(finalHtml);
@@ -829,24 +833,20 @@ export function MarkdownEditor({ content, onChange }: MarkdownEditorProps) {
   );
 
   const handleImageUpload = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (!file) return;
+      if (!file || !editor) return;
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const base64 = event.target?.result as string;
-        if (editor) {
-          editor
-            .chain()
-            .focus()
-            .insertContent(`![${file.name}](${base64})`)
-            .run();
-          toast.success("图片已插入");
-        }
-      };
-      reader.onerror = () => toast.error("图片读取失败");
-      reader.readAsDataURL(file);
+      try {
+        const supabase = createClient();
+        const ext = file.name.split(".").pop() || "png";
+        const [url] = await uploadImagesToStorage([{ blob: file, ext }], supabase);
+
+        editor.chain().focus().insertContent(`![${file.name}](${url})`).run();
+        toast.success("图片已上传");
+      } catch {
+        toast.error("图片上传失败");
+      }
 
       e.target.value = "";
     },
