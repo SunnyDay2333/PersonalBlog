@@ -136,22 +136,22 @@ function CustomImage(props: ComponentProps<"img">) {
   const { src, alt } = props;
   if (!src) return null;
   return (
-    <figure className="my-8 group">
-      <div className="relative overflow-hidden rounded-xl border border-border/50 shadow-sm transition-all duration-300 group-hover:shadow-md">
+    <span className="my-8 block group">
+      <span className="block relative overflow-hidden rounded-xl border border-border/50 shadow-sm transition-all duration-300 group-hover:shadow-md">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}
           alt={alt ?? ""}
-          className="w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+          className="block w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
           loading="lazy"
         />
-      </div>
+      </span>
       {alt && (
-        <figcaption className="mt-2 text-center text-xs text-muted-foreground/70">
+        <span className="mt-2 block text-center text-xs text-muted-foreground/70">
           {alt}
-        </figcaption>
+        </span>
       )}
-    </figure>
+    </span>
   );
 }
 
