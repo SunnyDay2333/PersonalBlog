@@ -58,10 +58,9 @@ export function HeroSection() {
         aria-hidden
       />
 
-      {/* 半透明白色遮罩 — 保护文字对比度 */}
+      {/* 半透明遮罩 — 亮色模式白色，暗色模式黑色，保护文字对比度 */}
       <div
-        className="absolute inset-0 z-[1]"
-        style={{ backgroundColor: "rgba(255, 255, 255, 0.6)" }}
+        className="absolute inset-0 z-[1] bg-background/60"
         aria-hidden
       />
 

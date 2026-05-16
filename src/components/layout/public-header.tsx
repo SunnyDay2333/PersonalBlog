@@ -16,19 +16,19 @@ export function PublicHeader() {
         <nav className="flex items-center gap-6">
           <Link
             href="/"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-foreground/70 dark:hover:text-foreground"
           >
             主页
           </Link>
           <Link
             href="/posts"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-foreground/70 dark:hover:text-foreground"
           >
             文章
           </Link>
           <Link
             href="/about"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-foreground/70 dark:hover:text-foreground"
           >
             关于
           </Link>
