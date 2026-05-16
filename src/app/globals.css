@@ -652,6 +652,35 @@ html[data-theme="dark"] .code-card-body [data-highlighted-line] {
 }
 
 /* ============================================================
+   首页时间轴（C 端）
+   ============================================================ */
+
+/* 移动端：隐藏中轴线，卡片自动堆叠为单列 */
+@media (max-width: 767px) {
+  .timeline-item {
+    flex-direction: column !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+/* 卡片动画 — 仅对 opacity + transform 做 transition（GPU 合成层） */
+.timeline-card {
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out,
+    box-shadow 0.3s ease-out,
+    border-color 0.3s ease-out;
+}
+
+/* 月份标签组进入动画（性能优化：will-change 仅在进入前设置） */
+.timeline-month {
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.7s ease-out;
+}
+
+/* ============================================================
    TipTap 编辑器样式（Admin 端专用）
    ============================================================ */
 
