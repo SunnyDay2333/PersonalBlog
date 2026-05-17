@@ -13,6 +13,7 @@ import {
   Settings,
   LogOut,
   PlusCircle,
+  MessageCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -35,6 +36,16 @@ const NAV_ITEMS = [
   {
     label: "新建文章",
     href: "/admin/posts/new",
+    icon: PlusCircle,
+  },
+  {
+    label: "说说管理",
+    href: "/admin/moments",
+    icon: MessageCircle,
+  },
+  {
+    label: "新建说说",
+    href: "/admin/moments/new",
     icon: PlusCircle,
   },
   {
