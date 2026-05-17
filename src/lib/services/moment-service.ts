@@ -4,7 +4,7 @@
 // 服务端/客户端均可调用
 // ============================================================
 
-import type { Moment, MomentImage, MomentWithImages, MomentWithAuthor, MomentAuthor, CreateMomentInput } from "@/types/moment";
+import type { Moment, MomentImage, MomentWithImages, CreateMomentInput } from "@/types/moment";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 
@@ -19,24 +19,15 @@ function groupImagesByMomentId(images: MomentImage[]): Record<string, MomentImag
   return map;
 }
 
-/** 从 join 结果中提取作者信息 */
-function extractAuthor(row: Record<string, unknown>): MomentAuthor {
-  const profile = row.profiles as { display_name: string | null; avatar_url: string | null } | null;
-  return {
-    display_name: profile?.display_name ?? null,
-    avatar_url: profile?.avatar_url ?? null,
-  };
-}
-
-/** 获取已发布说说列表（C 端，分页，含作者信息） */
+/** 获取已发布说说列表（C 端，分页） */
 export async function getPublishedMoments(
   supabase: Supabase,
   page = 0,
   pageSize = 20,
-): Promise<MomentWithAuthor[]> {
+): Promise<MomentWithImages[]> {
   const { data: moments, error } = await supabase
     .from("moments")
-    .select("*, profiles!moments_author_id_fkey(display_name, avatar_url)")
+    .select("*")
     .eq("status", "published")
     .order("created_at", { ascending: false })
     .range(page * pageSize, (page + 1) * pageSize - 1);
@@ -57,22 +48,16 @@ export async function getPublishedMoments(
   const grouped = groupImagesByMomentId((images as MomentImage[]) ?? []);
 
   return moments.map((m) => ({
-    id: m.id,
-    content: m.content,
-    status: m.status,
-    author_id: m.author_id,
-    created_at: m.created_at,
-    updated_at: m.updated_at,
-    author: extractAuthor(m as Record<string, unknown>),
+    ...m,
     images: grouped[m.id] ?? [],
-  })) as MomentWithAuthor[];
+  })) as MomentWithImages[];
 }
 
-/** 获取全部说说（B 端管理列表，含草稿，不分页，含作者信息） */
-export async function getAllMoments(supabase: Supabase): Promise<MomentWithAuthor[]> {
+/** 获取全部说说（B 端管理列表，含草稿，不分页） */
+export async function getAllMoments(supabase: Supabase): Promise<MomentWithImages[]> {
   const { data: moments, error } = await supabase
     .from("moments")
-    .select("*, profiles!moments_author_id_fkey(display_name, avatar_url)")
+    .select("*")
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
@@ -91,25 +76,19 @@ export async function getAllMoments(supabase: Supabase): Promise<MomentWithAutho
   const grouped = groupImagesByMomentId((images as MomentImage[]) ?? []);
 
   return moments.map((m) => ({
-    id: m.id,
-    content: m.content,
-    status: m.status,
-    author_id: m.author_id,
-    created_at: m.created_at,
-    updated_at: m.updated_at,
-    author: extractAuthor(m as Record<string, unknown>),
+    ...m,
     images: grouped[m.id] ?? [],
-  })) as MomentWithAuthor[];
+  })) as MomentWithImages[];
 }
 
-/** 按 ID 获取单条说说 + 关联图片 + 作者信息 */
+/** 按 ID 获取单条说说 + 关联图片 */
 export async function getMomentById(
   supabase: Supabase,
   id: string,
-): Promise<MomentWithAuthor | null> {
+): Promise<MomentWithImages | null> {
   const { data: moment, error } = await supabase
     .from("moments")
-    .select("*, profiles!moments_author_id_fkey(display_name, avatar_url)")
+    .select("*")
     .eq("id", id)
     .single();
 
@@ -124,22 +103,16 @@ export async function getMomentById(
   if (imgError) throw new Error(imgError.message);
 
   return {
-    id: moment.id,
-    content: moment.content,
-    status: moment.status,
-    author_id: moment.author_id,
-    created_at: moment.created_at,
-    updated_at: moment.updated_at,
-    author: extractAuthor(moment as Record<string, unknown>),
+    ...moment,
     images: (images as MomentImage[]) ?? [],
-  } as MomentWithAuthor;
+  } as MomentWithImages;
 }
 
 /** 创建说说 + 关联图片 */
 export async function createMoment(
   supabase: Supabase,
   input: CreateMomentInput & { author_id: string },
-): Promise<MomentWithAuthor> {
+): Promise<MomentWithImages> {
   const { data: moment, error } = await supabase
     .from("moments")
     .insert({

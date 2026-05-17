@@ -31,17 +31,6 @@ export interface MomentWithImages extends Moment {
   images: MomentImage[];
 }
 
-/** 作者简要信息（join profiles 表） */
-export interface MomentAuthor {
-  display_name: string | null;
-  avatar_url: string | null;
-}
-
-/** 说说 + 关联图片 + 作者信息（C 端完整展示类型） */
-export interface MomentWithAuthor extends MomentWithImages {
-  author: MomentAuthor;
-}
-
 /** 创建说说时的输入 */
 export interface CreateMomentInput {
   content: string;

@@ -9,7 +9,7 @@ import { PublicFooter } from "@/components/layout/public-footer";
 import { MomentCard } from "@/components/moments/moment-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { SITE_NAME } from "@/lib/constants";
-import type { MomentWithAuthor } from "@/types/moment";
+import type { MomentWithImages } from "@/types/moment";
 
 export const metadata: Metadata = {
   title: `说说 | ${SITE_NAME}`,
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
-async function getPublishedMoments(): Promise<MomentWithAuthor[]> {
+async function getPublishedMoments(): Promise<MomentWithImages[]> {
   const { createClient } = await import("@/lib/supabase/server");
   const { getPublishedMoments } = await import(
     "@/lib/services/moment-service"
@@ -33,14 +33,14 @@ export default async function MomentsPage() {
   return (
     <>
       <PublicHeader />
-      <main className="mx-auto w-full max-w-xl flex-1 px-4 py-10 sm:px-6 sm:py-14 bg-muted/30">
+      <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
         {moments.length === 0 ? (
           <EmptyState
             title="还没有说说"
             description="博主正在记录生活，敬请期待。"
           />
         ) : (
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-6">
             {moments.map((m) => (
               <MomentCard key={m.id} moment={m} />
             ))}

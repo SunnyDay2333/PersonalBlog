@@ -68,7 +68,7 @@ export function MomentGrid({ images }: MomentGridProps) {
 
   return (
     <>
-      <div className={`grid ${gridCols} gap-2`}>
+      <div className={`grid ${gridCols} gap-1`}>
         {displayImages.map((img, i) => {
           const isLast = total > 9 && i === 8;
           return (
@@ -76,18 +76,18 @@ export function MomentGrid({ images }: MomentGridProps) {
               key={img.id}
               type="button"
               onClick={() => setSelectedIndex(i)}
-              className={`relative overflow-hidden rounded-xl cursor-pointer ${
-                isSingle ? "aspect-square max-w-[60%]" : "aspect-square"
+              className={`relative overflow-hidden rounded-lg cursor-pointer ${
+                isSingle ? "aspect-square max-w-[66%]" : "aspect-square"
               }`}
             >
               <img
                 src={img.url}
                 alt={`图片 ${i + 1}`}
-                className="h-full w-full object-cover transition-all duration-300 hover:scale-[1.03] hover:brightness-105"
+                className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                 loading="lazy"
               />
               {isLast && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50">
+                <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/50">
                   <span className="text-white text-xl font-bold">
                     +{total - 9}
                   </span>

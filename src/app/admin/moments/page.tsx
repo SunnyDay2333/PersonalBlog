@@ -7,9 +7,9 @@ import { AuthGuard } from "@/components/admin/auth-guard";
 import { Badge } from "@/components/ui/badge";
 import { formatDetailDate } from "@/lib/utils/date";
 import { DeleteMomentButton } from "./delete-button";
-import type { MomentWithAuthor } from "@/types/moment";
+import type { MomentWithImages } from "@/types/moment";
 
-async function getMoments(): Promise<MomentWithAuthor[]> {
+async function getMoments(): Promise<MomentWithImages[]> {
   const { createAdminClient } = await import("@/lib/supabase/admin");
   const supabase = createAdminClient();
   const { getAllMoments } = await import("@/lib/services/moment-service");
