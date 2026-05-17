@@ -69,59 +69,67 @@ export function MomentEditor({ onSuccess }: MomentEditorProps) {
     if (content.trim().length === 0 || content.length > 500) return;
     setUploading(true);
 
-    try {
-      // 获取当前用户
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error("请先登录");
+    // 获取当前用户
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("请先登录");
+      setUploading(false);
+      return;
+    }
+
+    // 上传图片到 Storage（全部成功或全部放弃）
+    const uploadedFileNames: string[] = [];
+    const imageInputs: {
+      url: string;
+      width: number | null;
+      height: number | null;
+      sort_order: number;
+    }[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const ext = file.name.split(".").pop() ?? "png";
+      const fileName = `${Date.now()}-${i}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+      const { error: uploadErr } = await supabase.storage
+        .from("moment-images")
+        .upload(fileName, file);
+
+      if (uploadErr) {
+        // 回滚已上传的图片
+        if (uploadedFileNames.length > 0) {
+          await supabase.storage.from("moment-images").remove(uploadedFileNames);
+        }
+        toast.error(`图片 ${i + 1} 上传失败: ${uploadErr.message}`);
         setUploading(false);
         return;
       }
 
-      // 上传图片到 Storage
-      const imageInputs: {
-        url: string;
-        width: number | null;
-        height: number | null;
-        sort_order: number;
-      }[] = [];
+      uploadedFileNames.push(fileName);
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const ext = file.name.split(".").pop() ?? "png";
-        const fileName = `${Date.now()}-${i}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const publicUrl = supabase.storage
+        .from("moment-images")
+        .getPublicUrl(fileName).data.publicUrl;
 
-        const { error: uploadErr } = await supabase.storage
-          .from("moment-images")
-          .upload(fileName, file);
+      // 获取图片尺寸
+      const size = await new Promise<{ w: number; h: number }>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+        img.onerror = () => resolve({ w: 0, h: 0 });
+        img.src = publicUrl;
+      });
 
-        if (uploadErr) {
-          toast.error(`图片 ${i + 1} 上传失败: ${uploadErr.message}`);
-          continue;
-        }
+      imageInputs.push({
+        url: publicUrl,
+        width: size.w || null,
+        height: size.h || null,
+        sort_order: i,
+      });
+    }
 
-        const publicUrl = supabase.storage
-          .from("moment-images")
-          .getPublicUrl(fileName).data.publicUrl;
-
-        // 获取图片尺寸
-        const size = await new Promise<{ w: number; h: number }>((resolve) => {
-          const img = new Image();
-          img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
-          img.onerror = () => resolve({ w: 0, h: 0 });
-          img.src = publicUrl;
-        });
-
-        imageInputs.push({
-          url: publicUrl,
-          width: size.w || null,
-          height: size.h || null,
-          sort_order: i,
-        });
-      }
-
+    try {
       // 调用服务层创建说说
       const { createMoment } = await import(
         "@/lib/services/moment-service"
@@ -139,6 +147,14 @@ export function MomentEditor({ onSuccess }: MomentEditorProps) {
       setPreviews([]);
       onSuccess?.();
     } catch (err) {
+      // createMoment 失败，回滚已上传的 Storage 文件
+      if (uploadedFileNames.length > 0) {
+        try {
+          await supabase.storage.from("moment-images").remove(uploadedFileNames);
+        } catch (rollbackErr) {
+          console.error("[MomentEditor] 上传回滚失败:", rollbackErr);
+        }
+      }
       toast.error("发布失败: " + (err instanceof Error ? err.message : "未知错误"));
     } finally {
       setUploading(false);

@@ -7,6 +7,7 @@
 import type { Moment, MomentImage, MomentWithImages, CreateMomentInput } from "@/types/moment";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import { extractStoragePath } from "@/lib/utils/storage";
 
 type Supabase = SupabaseClient<Database>;
 
@@ -146,11 +147,33 @@ export async function createMoment(
   return (await getMomentById(supabase, moment.id))!;
 }
 
-/** 删除说说（级联删除关联图片记录） */
+/** 删除说说（先清理 Storage 文件，再级联删除 DB 记录） */
 export async function deleteMoment(
   supabase: Supabase,
   id: string,
 ): Promise<void> {
+  // 1. 查询关联图片 URL
+  const { data: images } = await supabase
+    .from("moment_images")
+    .select("url")
+    .eq("moment_id", id);
+
+  // 2. 从 URL 提取 Storage 文件路径并删除
+  if (images && images.length > 0) {
+    const fileNames = images
+      .map((img) => extractStoragePath(img.url, "moment-images"))
+      .filter((p): p is string => p !== null);
+
+    if (fileNames.length > 0) {
+      try {
+        await supabase.storage.from("moment-images").remove(fileNames);
+      } catch (err) {
+        console.error("[deleteMoment] Storage 文件清理失败:", err);
+      }
+    }
+  }
+
+  // 3. 删除 DB 记录
   const { error: imgError } = await supabase
     .from("moment_images")
     .delete()

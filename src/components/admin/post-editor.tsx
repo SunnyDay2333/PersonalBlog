@@ -41,6 +41,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { extractStoragePath, extractImagePathsFromMarkdown } from "@/lib/utils/storage";
 import type { Post, PostStatus } from "@/types/post";
 
 // ============================================================
@@ -119,6 +120,8 @@ export function PostEditor({ post }: PostEditorProps) {
 
   // 手动保存（立即）
   const handleManualSave = async () => {
+    const oldCoverImage = post.cover_image;
+
     setSaving(true);
     const { error } = await supabase
       .from("posts")
@@ -137,6 +140,18 @@ export function PostEditor({ post }: PostEditorProps) {
     if (error) {
       toast.error("保存失败: " + error.message);
     } else {
+      // 封面图变更时清理旧文件
+      if (coverImage !== oldCoverImage && oldCoverImage) {
+        const oldPath = extractStoragePath(oldCoverImage, "article-covers");
+        if (oldPath) {
+          try {
+            await supabase.storage.from("article-covers").remove([oldPath]);
+          } catch (err) {
+            console.error("[handleManualSave] 旧封面清理失败:", err);
+          }
+        }
+      }
+
       setLastSaved(new Date());
       setDirty(false);
       toast.success("已保存");
@@ -150,6 +165,8 @@ export function PostEditor({ post }: PostEditorProps) {
       setActiveTab("meta");
       return;
     }
+
+    const oldCoverImage = post.cover_image;
 
     setPublishing(true);
     const now = new Date().toISOString();
@@ -173,6 +190,18 @@ export function PostEditor({ post }: PostEditorProps) {
     if (error) {
       toast.error("发布失败: " + error.message);
     } else {
+      // 封面图变更时清理旧文件
+      if (coverImage !== oldCoverImage && oldCoverImage) {
+        const oldPath = extractStoragePath(oldCoverImage, "article-covers");
+        if (oldPath) {
+          try {
+            await supabase.storage.from("article-covers").remove([oldPath]);
+          } catch (err) {
+            console.error("[handlePublish] 旧封面清理失败:", err);
+          }
+        }
+      }
+
       setStatus("published");
       setDirty(false);
       toast.success("已发布！");
@@ -183,6 +212,27 @@ export function PostEditor({ post }: PostEditorProps) {
 
   // 删除
   const handleDelete = async () => {
+    // 1. 清理封面图
+    const coverPath = extractStoragePath(post.cover_image ?? "", "article-covers");
+    if (coverPath) {
+      try {
+        await supabase.storage.from("article-covers").remove([coverPath]);
+      } catch (err) {
+        console.error("[handleDelete] 封面图清理失败:", err);
+      }
+    }
+
+    // 2. 清理正文内嵌图片
+    const contentPaths = extractImagePathsFromMarkdown(post.content, "article-images");
+    if (contentPaths.length > 0) {
+      try {
+        await supabase.storage.from("article-images").remove(contentPaths);
+      } catch (err) {
+        console.error("[handleDelete] 正文图片清理失败:", err);
+      }
+    }
+
+    // 3. 删除 DB 行
     const { error } = await supabase.from("posts").delete().eq("id", post.id);
     if (error) {
       toast.error("删除失败: " + error.message);
