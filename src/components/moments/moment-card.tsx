@@ -27,7 +27,7 @@ export function MomentCard({ moment }: MomentCardProps) {
   const [showComments, setShowComments] = useState(false);
 
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+    <div className="moment-card rounded-xl border border-border bg-card p-5 shadow-sm">
       {/* ============ Header ============ */}
       <header className="flex items-center gap-3">
         <img
