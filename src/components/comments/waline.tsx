@@ -6,6 +6,7 @@ import "@waline/client/style";
 
 interface WalineCommentProps {
   path: string;
+  compact?: boolean;
 }
 
 type Status = "loading" | "unconfigured" | "ready" | "error";
@@ -54,7 +55,7 @@ function fillNickname(nick: string) {
 // ============================================================
 // 主组件
 // ============================================================
-export function WalineComment({ path }: WalineCommentProps) {
+export function WalineComment({ path, compact = false }: WalineCommentProps) {
   const walineContainerRef = useRef<HTMLDivElement>(null);
   const walineInstanceRef = useRef<{ destroy: () => void } | null>(null);
   const mountedRef = useRef(true);
@@ -151,6 +152,38 @@ export function WalineComment({ path }: WalineCommentProps) {
     };
   }, [path]);
 
+  // ---- 状态提示（compact 与 full 共用） ----
+  const statusUI = (
+    <>
+      {status === "loading" && (
+        <div className="animate-pulse rounded-xl border border-border bg-card p-4 text-center">
+          <div className="h-4 w-24 mx-auto rounded bg-muted" />
+        </div>
+      )}
+
+      {status === "unconfigured" && (
+        <div className="rounded-xl border border-border bg-card p-4 text-center text-xs text-muted-foreground">
+          评论系统待配置
+        </div>
+      )}
+
+      {status === "error" && (
+        <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-4 text-center text-xs text-red-500">
+          评论加载失败
+        </div>
+      )}
+    </>
+  );
+
+  if (compact) {
+    return (
+      <div>
+        {statusUI}
+        <div ref={walineContainerRef} />
+      </div>
+    );
+  }
+
   return (
     <section className="mt-12 border-t border-border pt-8">
       <div className="mb-6 flex items-center justify-between">
@@ -164,7 +197,7 @@ export function WalineComment({ path }: WalineCommentProps) {
           <button
             onClick={handleAnonymous}
             className="group inline-flex items-center gap-1.5 rounded-full border border-border bg-gradient-to-br from-amber-400/10 to-orange-500/10 px-4 py-2 text-xs font-medium text-muted-foreground transition-all hover:border-amber-400/40 hover:text-foreground hover:shadow-sm active:scale-95"
-            title={`下次点击随机切换昵称，当前可生成：“${randomNick}”`}
+            title={`下次点击随机切换昵称，当前可生成："${randomNick}"`}
           >
             <SparklesIcon className="h-3.5 w-3.5 text-amber-500 transition-transform group-hover:rotate-12" />
             匿名评论
@@ -172,45 +205,7 @@ export function WalineComment({ path }: WalineCommentProps) {
         )}
       </div>
 
-      {/* 状态提示 */}
-      {status === "loading" && (
-        <div className="animate-pulse rounded-2xl border border-border bg-card p-8 text-center">
-          <div className="h-6 w-32 mx-auto rounded bg-muted" />
-          <div className="mt-4 h-24 rounded bg-muted/50" />
-        </div>
-      )}
-
-      {status === "unconfigured" && (
-        <div className="rounded-2xl border border-border bg-gradient-to-br from-card to-accent/20 p-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#425AEF]/10">
-            <MessageCircle className="h-8 w-8 text-[#425AEF]" />
-          </div>
-          <h3 className="mb-2 text-lg font-semibold text-foreground">
-            评论系统待配置
-          </h3>
-          <p className="mx-auto max-w-md text-sm text-muted-foreground">
-            Waline 是一款简洁、安全的评论系统，支持 GitHub 登录和表情回复。
-          </p>
-          <a
-            href="https://waline.js.org/guide/get-started/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#425AEF] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#425AEF]/90"
-          >
-            部署 Waline
-            <ExternalLink className="h-4 w-4" />
-          </a>
-          <p className="mt-4 text-xs text-muted-foreground">
-            部署完成后，在 .env.local 中设置 NEXT_PUBLIC_WALINE_SERVER_URL
-          </p>
-        </div>
-      )}
-
-      {status === "error" && (
-        <div className="rounded-2xl border border-red-500/50 bg-red-500/10 p-6 text-center text-sm text-red-500">
-          评论加载失败，请检查网络或 Waline 服务是否正常运行
-        </div>
-      )}
+      {statusUI}
 
       {/* Waline 独占容器 */}
       <div ref={walineContainerRef} />
