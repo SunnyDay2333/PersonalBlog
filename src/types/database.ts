@@ -255,6 +255,77 @@ export interface Database {
           },
         ];
       };
+      moments: {
+        Row: {
+          id: string;
+          content: string;
+          status: "draft" | "published" | "archived";
+          author_id: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          content: string;
+          status?: "draft" | "published" | "archived";
+          author_id: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          content?: string;
+          status?: "draft" | "published" | "archived";
+          author_id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "moments_author_id_fkey";
+            columns: ["author_id"];
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      moment_images: {
+        Row: {
+          id: string;
+          moment_id: string;
+          url: string;
+          width: number | null;
+          height: number | null;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          moment_id: string;
+          url: string;
+          width?: number | null;
+          height?: number | null;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          moment_id?: string;
+          url?: string;
+          width?: number | null;
+          height?: number | null;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "moment_images_moment_id_fkey";
+            columns: ["moment_id"];
+            referencedRelation: "moments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

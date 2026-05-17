@@ -651,6 +651,58 @@ html[data-theme="dark"] .code-card-body [data-highlighted-line] {
   display: none !important;
 }
 
+/* ---- Waline 卡片内紧凑模式 ---- */
+/* 输入框 */
+.wl-panel {
+  border-radius: 0.75rem !important;
+  border-color: var(--border) !important;
+  background: var(--card) !important;
+  box-shadow: none !important;
+}
+.wl-editor:focus,
+.wl-input:focus {
+  border-color: #425AEF !important;
+  box-shadow: 0 0 0 2px rgba(66, 90, 239, 0.15) !important;
+}
+
+/* 发布按钮 */
+.wl-btn {
+  border-radius: 0.625rem !important;
+  background: var(--foreground) !important;
+  color: var(--background) !important;
+  font-size: 0.8125rem !important;
+  padding: 0.375rem 1rem !important;
+  transition: opacity 0.2s !important;
+}
+.wl-btn:hover {
+  opacity: 0.85 !important;
+}
+
+/* 评论卡片 */
+.wl-card {
+  border-radius: 0.75rem !important;
+  border-color: var(--border) !important;
+  background: transparent !important;
+  padding: 0.75rem 0 !important;
+}
+
+/* 表情面板 */
+.wl-emoji-popup {
+  border-radius: 0.75rem !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 隐藏 Waline 顶部多余的计数 header（紧凑模式不需要） */
+.wl-header {
+  display: none !important;
+}
+
+/* 调整评论区整体间距 */
+.wl-comment {
+  padding: 0.5rem 0 !important;
+}
+
 /* ============================================================
    首页时间轴（C 端）
    ============================================================ */
