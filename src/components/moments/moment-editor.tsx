@@ -18,6 +18,19 @@ interface MomentEditorProps {
   onSuccess?: () => void;
 }
 
+/**
+ * 从本地 Blob URL 读取图片的 naturalWidth / naturalHeight
+ * 不需要网络请求，直接从浏览器内存中的 Blob 读取
+ */
+function getImageDimensions(url: string): Promise<{ w: number; h: number }> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+    img.onerror = () => resolve({ w: 0, h: 0 });
+    img.src = url;
+  });
+}
+
 export function MomentEditor({ onSuccess }: MomentEditorProps) {
   const supabase = createClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -79,7 +92,50 @@ export function MomentEditor({ onSuccess }: MomentEditorProps) {
       return;
     }
 
-    // 上传图片到 Storage（全部成功或全部放弃）
+    // 1. 从本地预览 URL 并行读取所有图片尺寸（本地操作，毫秒级）
+    const dimensions = await Promise.all(previews.map(getImageDimensions));
+
+    // 2. 并行上传所有图片到 Storage
+    const uploadResults = await Promise.all(
+      files.map(async (file, i) => {
+        const ext = file.name.split(".").pop() ?? "png";
+        const fileName = `${Date.now()}-${i}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+        const { error: uploadErr } = await supabase.storage
+          .from("moment-images")
+          .upload(fileName, file);
+
+        if (uploadErr) {
+          return { index: i, error: uploadErr, fileName: null, publicUrl: null };
+        }
+
+        const publicUrl = supabase.storage
+          .from("moment-images")
+          .getPublicUrl(fileName).data.publicUrl;
+
+        return { index: i, error: null, fileName, publicUrl };
+      }),
+    );
+
+    // 3. 检查是否有上传失败
+    const succeeded = uploadResults.filter((r) => !r.error);
+    const failed = uploadResults.filter((r) => r.error);
+
+    if (failed.length > 0) {
+      // 回滚所有已上传成功的文件
+      const succeededFileNames = succeeded
+        .map((r) => r.fileName)
+        .filter((f): f is string => f !== null);
+      if (succeededFileNames.length > 0) {
+        await supabase.storage.from("moment-images").remove(succeededFileNames);
+      }
+      const firstFailed = failed[0];
+      toast.error(`图片 ${firstFailed.index + 1} 上传失败: ${firstFailed.error!.message}`);
+      setUploading(false);
+      return;
+    }
+
+    // 4. 按原始顺序组装 imageInputs（保持 sort_order 稳定）
     const uploadedFileNames: string[] = [];
     const imageInputs: {
       url: string;
@@ -88,44 +144,13 @@ export function MomentEditor({ onSuccess }: MomentEditorProps) {
       sort_order: number;
     }[] = [];
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const ext = file.name.split(".").pop() ?? "png";
-      const fileName = `${Date.now()}-${i}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-
-      const { error: uploadErr } = await supabase.storage
-        .from("moment-images")
-        .upload(fileName, file);
-
-      if (uploadErr) {
-        // 回滚已上传的图片
-        if (uploadedFileNames.length > 0) {
-          await supabase.storage.from("moment-images").remove(uploadedFileNames);
-        }
-        toast.error(`图片 ${i + 1} 上传失败: ${uploadErr.message}`);
-        setUploading(false);
-        return;
-      }
-
-      uploadedFileNames.push(fileName);
-
-      const publicUrl = supabase.storage
-        .from("moment-images")
-        .getPublicUrl(fileName).data.publicUrl;
-
-      // 获取图片尺寸
-      const size = await new Promise<{ w: number; h: number }>((resolve) => {
-        const img = new Image();
-        img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
-        img.onerror = () => resolve({ w: 0, h: 0 });
-        img.src = publicUrl;
-      });
-
+    for (const r of uploadResults) {
+      if (r.fileName) uploadedFileNames.push(r.fileName);
       imageInputs.push({
-        url: publicUrl,
-        width: size.w || null,
-        height: size.h || null,
-        sort_order: i,
+        url: r.publicUrl!,
+        width: dimensions[r.index].w || null,
+        height: dimensions[r.index].h || null,
+        sort_order: r.index,
       });
     }
 
