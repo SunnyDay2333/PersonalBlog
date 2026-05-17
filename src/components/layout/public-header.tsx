@@ -27,6 +27,12 @@ export function PublicHeader() {
             文章
           </Link>
           <Link
+            href="/moments"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-foreground/70 dark:hover:text-foreground"
+          >
+            说说
+          </Link>
+          <Link
             href="/about"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-foreground/70 dark:hover:text-foreground"
           >
