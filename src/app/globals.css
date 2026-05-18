@@ -1088,13 +1088,15 @@ html[data-theme="dark"] .code-card-body [data-highlighted-line] {
 
 /* ============================================================
    说说卡片悬浮微交互
-   弹簧缓动 + Y轴微抬 + 阴影加深
+   亮色：弹簧缓动 + Y轴微抬 + 阴影加深
+   暗色：暗黑玻璃拟态 + 微光边框 + 白晕阴影
    ============================================================ */
 .moment-card {
   transition:
     transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
     box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-    border-color 0.3s ease;
+    border-color 0.3s ease,
+    background-color 0.3s ease;
 }
 
 .moment-card:hover {
@@ -1105,9 +1107,18 @@ html[data-theme="dark"] .code-card-body [data-highlighted-line] {
   border-color: oklch(0.922 0 0 / 0.6);
 }
 
+/* 暗色模式 — 暗黑玻璃拟态 */
+.dark .moment-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
 .dark .moment-card:hover {
+  background: rgba(255, 255, 255, 0.05);
   box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.3),
-    0 2px 8px rgba(0, 0, 0, 0.2);
-  border-color: oklch(1 0 0 / 0.15);
+    0 8px 30px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
 }
