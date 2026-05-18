@@ -1111,11 +1111,3 @@ html[data-theme="dark"] .code-card-body [data-highlighted-line] {
     0 2px 8px rgba(0, 0, 0, 0.2);
   border-color: oklch(1 0 0 / 0.15);
 }
-
-/* 隐藏滚动条（横向滚动容器用） */
-.scrollbar-none {
-  scrollbar-width: none;
-}
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
-}
