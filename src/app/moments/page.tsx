@@ -50,7 +50,7 @@ export default async function MomentsPage() {
 
         {/* ===== 内容廊道 — 匹配导航栏宽度，半透明乳白底 + 柔化边界 ===== */}
         <div
-          className="relative mx-auto max-w-6xl min-h-[calc(100vh-56px)] bg-white/38"
+          className="relative mx-auto max-w-6xl min-h-[calc(100vh-56px)] bg-white/38 dark:bg-card/55"
           style={{
             boxShadow: "inset 1px 0 0 rgba(0,0,0,0.04), inset -1px 0 0 rgba(0,0,0,0.04)",
           }}
