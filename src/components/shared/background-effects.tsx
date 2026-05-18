@@ -463,7 +463,7 @@ export function BackgroundEffects() {
     };
   }, [resolvedTheme]);
 
-  if (isPostDetail) return null;
+  const canvasStyle = isPostDetail ? { display: "none" } : undefined;
 
   return (
     <>
@@ -471,11 +471,13 @@ export function BackgroundEffects() {
         ref={ribbonCanvasRef}
         id="bg-ribbon-canvas"
         aria-hidden="true"
+        style={canvasStyle}
       />
       <canvas
         ref={universeCanvasRef}
         id="bg-universe-canvas"
         aria-hidden="true"
+        style={canvasStyle}
       />
     </>
   );
