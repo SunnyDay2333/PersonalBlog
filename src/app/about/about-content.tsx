@@ -111,12 +111,9 @@ function HelloAbout() {
       ))}
 
       {/* mix-blend-screen 文字层 */}
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white mix-blend-screen dark:bg-transparent">
-        <h1 className="text-[clamp(3rem,11vw,9rem)] font-bold leading-[0.85] tracking-tight text-black dark:text-white">
-          Hello,
-        </h1>
-        <h1 className="text-[clamp(3rem,11vw,9rem)] font-bold leading-[0.85] tracking-tight text-black dark:text-white self-end mr-[clamp(1rem,8vw,6rem)]">
-          there!
+      <div className="absolute inset-0 z-10 flex items-center justify-center bg-white mix-blend-screen dark:bg-transparent">
+        <h1 className="text-[clamp(3rem,11vw,9rem)] font-bold leading-none tracking-tight text-black dark:text-white">
+          Hello there!
         </h1>
       </div>
     </motion.div>
