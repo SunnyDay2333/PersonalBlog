@@ -1,8 +1,12 @@
 // ============================================================
 // 说说列表页（C 端）
 // Server Component — 直连 Supabase 获取已发布说说
-// 布局：与导航栏共享 max-w-6xl 基准线，卡片左对齐
-//       右侧留白以呼吸光球 + 波点纹理装饰
+//
+// 布局设计：
+//   · 全宽背景层（dot 纹理，透明底以透出 canvas 动效）
+//   · 玻璃廊道（max-w-6xl，backdrop-blur 柔和区分内外）
+//   · 光球在廊道内右侧点缀
+//   · 卡片在廊道内水平居中
 // ============================================================
 
 import type { Metadata } from "next";
@@ -36,33 +40,35 @@ export default async function MomentsPage() {
     <>
       <PublicHeader />
 
-      {/* ===== 主内容区 — 与导航栏共享 max-w-6xl 基准线 ===== */}
-      <main className="relative mx-auto w-full max-w-6xl flex-1 overflow-hidden px-4 py-10 sm:px-6 sm:py-14 bg-background bg-dot-texture">
+      {/* ===== 全宽背景层 — 仅 dot 纹理，透明底透出 canvas 动效 ===== */}
+      <main className="relative flex-1 overflow-hidden bg-dot-texture py-10 sm:py-14">
 
-        {/* ===== 装饰光球（右侧留白区域，毛玻璃呼吸动画） ===== */}
-        {/* 天蓝色光球 — 右上方 */}
-        <div
-          className="orb-glow orb-glow--sky hidden sm:block"
-          style={{ top: "10%", right: "5%" }}
-        />
-        {/* 樱花粉色光球 — 右下方，错开位置 */}
-        <div
-          className="orb-glow orb-glow--sakura hidden sm:block"
-          style={{ top: "55%", right: "14%" }}
-        />
+        {/* ===== 玻璃廊道 — 与导航栏等宽，backdrop-blur 柔和区分内外 ===== */}
+        <div className="relative mx-auto max-w-6xl border-x border-border/25 bg-card/60 backdrop-blur-md px-4 sm:px-6">
 
-        {/* ===== 卡片流 — max-w-2xl 左对齐，与导航栏“主页”左侧基准线一致 ===== */}
-        <div className="relative z-10 flex flex-col gap-6 max-w-2xl">
-          {moments.length === 0 ? (
-            <EmptyState
-              title="还没有说说"
-              description="博主正在记录生活，敬请期待。"
-            />
-          ) : (
-            moments.map((m) => (
-              <MomentCard key={m.id} moment={m} />
-            ))
-          )}
+          {/* ===== 廊道内光球装饰 — 右侧呼吸光晕 ===== */}
+          <div
+            className="orb-glow orb-glow--sky hidden sm:block"
+            style={{ top: "8%", right: "6%" }}
+          />
+          <div
+            className="orb-glow orb-glow--sakura hidden sm:block"
+            style={{ top: "48%", right: "12%" }}
+          />
+
+          {/* ===== 卡片列 — 廊道内居中 ===== */}
+          <div className="relative z-10 mx-auto flex max-w-2xl flex-col gap-6 py-10">
+            {moments.length === 0 ? (
+              <EmptyState
+                title="还没有说说"
+                description="博主正在记录生活，敬请期待。"
+              />
+            ) : (
+              moments.map((m) => (
+                <MomentCard key={m.id} moment={m} />
+              ))
+            )}
+          </div>
         </div>
       </main>
 
