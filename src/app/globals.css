@@ -717,8 +717,8 @@ html[data-theme="dark"] .code-card-body [data-highlighted-line] {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08) !important;
 }
 
-/* 隐藏 Waline 顶部多余的计数 header（紧凑模式不需要） */
-.wl-header {
+/* Waline header 内的计数隐藏（输入框在 header 内，不能整个隐藏） */
+.wl-header .wl-count {
   display: none !important;
 }
 
