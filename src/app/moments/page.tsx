@@ -6,6 +6,8 @@
 //   · 全宽透明背景层，canvas 动效透出
 //   · 内容廊道（max-w-6xl），半透明乳白底 + 柔光边界
 //   · 三列：左 180px 状态卡 / 中 max-w-[600px] 卡片流 / 右 180px 光球
+//   · 卡片按年份分组，年份分割线
+//   · 廊道底部渐变过渡至 Footer
 // ============================================================
 
 import type { Metadata } from "next";
@@ -13,7 +15,9 @@ import { PublicHeader } from "@/components/layout/public-header";
 import { PublicFooter } from "@/components/layout/public-footer";
 import { MomentCard } from "@/components/moments/moment-card";
 import { AuthorStatusCard } from "@/components/moments/author-status-card";
+import { YearDivider } from "@/components/moments/year-divider";
 import { EmptyState } from "@/components/shared/empty-state";
+import { groupByYear } from "@/lib/utils/group-by-year";
 import { SITE_NAME } from "@/lib/constants";
 import type { MomentWithImages } from "@/types/moment";
 
@@ -35,6 +39,7 @@ async function getPublishedMoments(): Promise<MomentWithImages[]> {
 
 export default async function MomentsPage() {
   const moments = await getPublishedMoments();
+  const yearGroups = groupByYear(moments);
 
   return (
     <>
@@ -64,7 +69,7 @@ export default async function MomentsPage() {
 
             {/* 左列 — 作者状态卡（桌面端 sticky） */}
             <aside className="hidden w-[180px] shrink-0 lg:block">
-              <div className="sticky top-[88px]">
+              <div className="sticky top-[72px]">
                 <AuthorStatusCard momentCount={moments.length} />
               </div>
             </aside>
@@ -72,14 +77,22 @@ export default async function MomentsPage() {
             {/* 中列 — 卡片流 */}
             <div className="w-full max-w-[600px] min-w-0">
               <div className="flex flex-col gap-[22px]">
-                {moments.length === 0 ? (
+                {/* 移动端紧凑作者信息条 */}
+                <AuthorStatusCard momentCount={moments.length} compact />
+
+                {yearGroups.length === 0 ? (
                   <EmptyState
                     title="还没有说说"
                     description="博主正在记录生活，敬请期待。"
                   />
                 ) : (
-                  moments.map((m) => (
-                    <MomentCard key={m.id} moment={m} />
+                  yearGroups.map((group) => (
+                    <div key={group.year} className="flex flex-col gap-[22px]">
+                      <YearDivider year={group.year} />
+                      {group.items.map((m) => (
+                        <MomentCard key={m.id} moment={m} />
+                      ))}
+                    </div>
                   ))
                 )}
               </div>
@@ -98,6 +111,9 @@ export default async function MomentsPage() {
             </div>
 
           </div>
+
+          {/* 底部渐变过渡 — 从透明到 Footer 实色 */}
+          <div className="pointer-events-none h-12 bg-gradient-to-b from-transparent to-background" />
         </div>
       </main>
 
