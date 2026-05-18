@@ -55,8 +55,39 @@ export default async function HomePage() {
 
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
 
-          {/* ===== 最近说说 — 横向卡片栏 ===== */}
+          {/* ===== 最近文章 — 时间线 ===== */}
           <div className="mb-10 flex items-center gap-4">
+            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+            <h2 className="shrink-0 text-sm font-medium tracking-wide text-muted-foreground uppercase">
+              最近文章
+            </h2>
+            <span className="relative h-px flex-1 overflow-hidden bg-gradient-to-r from-transparent via-border to-transparent">
+              <span className="absolute inset-0 -translate-x-full animate-divider-shimmer bg-gradient-to-r from-transparent via-[#425AEF]/50 to-transparent" />
+            </span>
+          </div>
+
+          {posts.length === 0 ? (
+            <EmptyState
+              title="还没有文章"
+              description="博主正在酝酿灵感，敬请期待。"
+            />
+          ) : (
+            <>
+              <PostTimelineEnhanced posts={posts} />
+              <div className="mt-10 flex justify-end">
+                <Link
+                  href="/posts"
+                  className="inline-flex items-center gap-1 text-[13px] font-medium text-[#425AEF] transition-all hover:gap-2"
+                >
+                  查看全部文章
+                  <span className="text-base leading-none">→</span>
+                </Link>
+              </div>
+            </>
+          )}
+
+          {/* ===== 最近说说 — 横向卡片栏 ===== */}
+          <div className="mt-16 mb-10 flex items-center gap-4">
             <span className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
             <h2 className="shrink-0 text-sm font-medium tracking-wide text-muted-foreground uppercase">
               最近说说
@@ -83,37 +114,6 @@ export default async function HomePage() {
                   className="inline-flex items-center gap-1 text-[13px] font-medium text-[#425AEF] transition-all hover:gap-2"
                 >
                   查看全部说说
-                  <span className="text-base leading-none">→</span>
-                </Link>
-              </div>
-            </>
-          )}
-
-          {/* ===== 最近文章 — 时间线 ===== */}
-          <div className="mt-16 mb-10 flex items-center gap-4">
-            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
-            <h2 className="shrink-0 text-sm font-medium tracking-wide text-muted-foreground uppercase">
-              最近文章
-            </h2>
-            <span className="relative h-px flex-1 overflow-hidden bg-gradient-to-r from-transparent via-border to-transparent">
-              <span className="absolute inset-0 -translate-x-full animate-divider-shimmer bg-gradient-to-r from-transparent via-[#425AEF]/50 to-transparent" />
-            </span>
-          </div>
-
-          {posts.length === 0 ? (
-            <EmptyState
-              title="还没有文章"
-              description="博主正在酝酿灵感，敬请期待。"
-            />
-          ) : (
-            <>
-              <PostTimelineEnhanced posts={posts} />
-              <div className="mt-10 flex justify-end">
-                <Link
-                  href="/posts"
-                  className="inline-flex items-center gap-1 text-[13px] font-medium text-[#425AEF] transition-all hover:gap-2"
-                >
-                  查看全部文章
                   <span className="text-base leading-none">→</span>
                 </Link>
               </div>
