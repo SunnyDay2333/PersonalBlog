@@ -6,6 +6,7 @@
 // ============================================================
 
 import Link from "next/link";
+import { Home, FileText, MessageCircle, User } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 const AVATAR_URL = "https://avatars.githubusercontent.com/u/144646414?v=4";
@@ -16,7 +17,7 @@ export function PublicHeader() {
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/65 backdrop-blur-xl backdrop-saturate-150 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
         {/* 左侧：Logo + 导航 */}
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-6">
           {/* 手写体用户名 + 头像 */}
           <Link
             href="/"
@@ -39,29 +40,33 @@ export function PublicHeader() {
           <span className="h-5 w-px bg-border/60" />
 
           {/* 导航链接 */}
-          <nav className="flex items-center gap-5">
+          <nav className="flex items-center gap-6">
             <Link
               href="/"
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-foreground/70 dark:hover:text-foreground"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-foreground/70 dark:hover:text-foreground"
             >
+              <Home className="h-3.5 w-3.5" />
               主页
             </Link>
             <Link
               href="/posts"
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-foreground/70 dark:hover:text-foreground"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-foreground/70 dark:hover:text-foreground"
             >
+              <FileText className="h-3.5 w-3.5" />
               文章
             </Link>
             <Link
               href="/moments"
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-foreground/70 dark:hover:text-foreground"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-foreground/70 dark:hover:text-foreground"
             >
+              <MessageCircle className="h-3.5 w-3.5" />
               说说
             </Link>
             <Link
               href="/about"
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-foreground/70 dark:hover:text-foreground"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-foreground/70 dark:hover:text-foreground"
             >
+              <User className="h-3.5 w-3.5" />
               关于
             </Link>
           </nav>
