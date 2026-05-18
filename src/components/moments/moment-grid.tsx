@@ -77,7 +77,7 @@ export function MomentGrid({ images }: MomentGridProps) {
               type="button"
               onClick={() => setSelectedIndex(i)}
               className={`relative overflow-hidden rounded-lg cursor-pointer ${
-                isSingle ? "aspect-square max-w-[55%]" : "aspect-square"
+                isSingle ? "aspect-[4/3] max-w-[62%]" : "aspect-square"
               }`}
             >
               <img

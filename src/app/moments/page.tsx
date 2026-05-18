@@ -3,9 +3,9 @@
 // Server Component — 直连 Supabase 获取已发布说说
 //
 // 布局设计：
-//   · 全宽背景层（dot 纹理，透明底以透出 canvas 动效）
-//   · 玻璃廊道（max-w-6xl，backdrop-blur 柔和区分内外）
-//   · 三列：左状态卡 / 中卡片流 / 右光球装饰
+//   · 全宽透明背景层，canvas 动效透出
+//   · 内容廊道（max-w-6xl），半透明乳白底 + 柔光边界
+//   · 三列：左 180px 状态卡 / 中 max-w-[600px] 卡片流 / 右 180px 光球
 // ============================================================
 
 import type { Metadata } from "next";
@@ -40,48 +40,62 @@ export default async function MomentsPage() {
     <>
       <PublicHeader />
 
-      {/* ===== 全宽背景层 — 仅 dot 纹理，透明底透出 canvas 动效 ===== */}
-      <main className="relative flex-1 overflow-hidden bg-dot-texture py-10 sm:py-14">
+      {/* ===== 全宽背景层 — 透明底透出 canvas 动效 ===== */}
+      <main className="relative flex-1 overflow-hidden">
 
-        {/* ===== 玻璃廊道 — 与导航栏等宽 ===== */}
-        <div className="relative mx-auto max-w-6xl border-x border-border/25 bg-card/60 backdrop-blur-md px-4 sm:px-6">
-
-          {/* ===== 廊道内光球装饰 — 右侧呼吸光晕 ===== */}
+        {/* ===== 内容廊道 — 匹配导航栏宽度，半透明乳白底 + 柔化边界 ===== */}
+        <div
+          className="relative mx-auto max-w-6xl min-h-[calc(100vh-56px)] bg-white/38"
+          style={{
+            boxShadow: "inset 1px 0 0 rgba(0,0,0,0.04), inset -1px 0 0 rgba(0,0,0,0.04)",
+          }}
+        >
+          {/* 廊道内点状纹理叠加 */}
           <div
-            className="orb-glow orb-glow--sky hidden sm:block"
-            style={{ top: "8%", right: "6%" }}
-          />
-          <div
-            className="orb-glow orb-glow--sakura hidden sm:block"
-            style={{ top: "48%", right: "12%" }}
+            className="pointer-events-none absolute inset-0 z-0"
+            style={{
+              backgroundImage: "radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px)",
+              backgroundSize: "24px 24px",
+            }}
           />
 
           {/* ===== 三列布局 ===== */}
-          <div className="flex justify-center gap-4 lg:gap-6 py-10">
+          <div className="relative z-[1] flex justify-center gap-8 px-6 py-10 sm:py-14">
 
-            {/* 左列 — 博主状态卡（桌面端 sticky） */}
-            <aside className="hidden lg:block w-[172px] shrink-0">
-              <div className="sticky top-20">
+            {/* 左列 — 作者状态卡（桌面端 sticky） */}
+            <aside className="hidden w-[180px] shrink-0 lg:block">
+              <div className="sticky top-[88px]">
                 <AuthorStatusCard momentCount={moments.length} />
               </div>
             </aside>
 
-            {/* 中列 — 说说卡片流 */}
-            <div className="relative z-10 w-full max-w-2xl flex flex-col gap-6">
-              {moments.length === 0 ? (
-                <EmptyState
-                  title="还没有说说"
-                  description="博主正在记录生活，敬请期待。"
-                />
-              ) : (
-                moments.map((m) => (
-                  <MomentCard key={m.id} moment={m} />
-                ))
-              )}
+            {/* 中列 — 卡片流 */}
+            <div className="w-full max-w-[600px] min-w-0">
+              <div className="flex flex-col gap-[22px]">
+                {moments.length === 0 ? (
+                  <EmptyState
+                    title="还没有说说"
+                    description="博主正在记录生活，敬请期待。"
+                  />
+                ) : (
+                  moments.map((m) => (
+                    <MomentCard key={m.id} moment={m} />
+                  ))
+                )}
+              </div>
             </div>
 
-            {/* 右列 — 留空给光球呼吸 ===== */}
-            <div className="hidden lg:block w-[172px] shrink-0" />
+            {/* 右列 — 光球装饰 */}
+            <div className="relative hidden w-[180px] shrink-0 lg:block">
+              <div
+                className="orb-glow orb-glow--sky"
+                style={{ top: "60px", right: "-40px" }}
+              />
+              <div
+                className="orb-glow orb-glow--sakura"
+                style={{ top: "320px", right: "10px" }}
+              />
+            </div>
 
           </div>
         </div>
