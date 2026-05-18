@@ -112,7 +112,7 @@ function HelloAbout() {
 
       {/* mix-blend-screen 文字层 */}
       <div className="absolute inset-0 z-10 flex flex-col justify-center bg-white mix-blend-screen dark:bg-transparent">
-        <h1 className="self-center text-[clamp(3rem,11vw,9rem)] font-bold leading-none tracking-tight text-black dark:text-white">
+        <h1 className="self-start text-[clamp(3rem,11vw,9rem)] font-bold leading-none tracking-tight text-black dark:text-white">
           Hello,
         </h1>
         <h1 className="self-end text-[clamp(3rem,11vw,9rem)] font-bold leading-none tracking-tight text-black dark:text-white">
