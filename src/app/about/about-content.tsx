@@ -85,7 +85,7 @@ function HelloAbout() {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="relative mb-6 h-[240px] overflow-hidden rounded-3xl bg-[#2128bd] select-none sm:h-[280px]"
+      className="relative mb-6 h-[240px] overflow-hidden rounded-3xl border border-white/[0.08] bg-[#2128bd]/70 backdrop-blur-xl select-none sm:h-[280px]"
     >
       {/* 彩色跟随圆 */}
       {[
