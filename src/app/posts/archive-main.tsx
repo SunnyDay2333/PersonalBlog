@@ -70,6 +70,13 @@ export function ArchiveMain({ posts, emptyMessage }: ArchiveMainProps) {
             - {posts.length}
           </span>
         </h1>
+        <span
+          className="text-2xl text-muted-foreground/40 select-none sm:text-3xl"
+          style={{ fontFamily: "var(--font-caveat)" }}
+          aria-hidden
+        >
+          Archives
+        </span>
       </div>
 
       {/* 按年份分组列表 */}
