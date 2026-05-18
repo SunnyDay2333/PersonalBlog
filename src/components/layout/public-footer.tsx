@@ -3,8 +3,8 @@
 // 极简设计，版权信息 + GitHub 链接 + 技术栈署名
 // ============================================================
 
-import Link from "next/link";
 import { GithubIcon } from "@/components/icons/github-icon";
+import { BilibiliIcon } from "@/components/icons/bilibili-icon";
 import { SITE_NAME } from "@/lib/constants";
 
 export function PublicFooter() {
@@ -22,15 +22,26 @@ export function PublicFooter() {
           </span>
         </div>
 
-        <a
-          href="https://github.com/SunnyDay2333"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
-        >
-          <GithubIcon className="h-3.5 w-3.5" />
-          GitHub
-        </a>
+        <nav className="flex items-center gap-5">
+          <a
+            href="https://github.com/SunnyDay2333"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+          >
+            <GithubIcon className="h-3.5 w-3.5" />
+            GitHub
+          </a>
+          <a
+            href="https://space.bilibili.com/224572652"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+          >
+            <BilibiliIcon className="h-3.5 w-3.5" />
+            BiliBili
+          </a>
+        </nav>
       </div>
     </footer>
   );
