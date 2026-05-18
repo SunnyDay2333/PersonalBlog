@@ -612,6 +612,30 @@ html[data-theme="dark"] .code-card-body [data-highlighted-line] {
 
 
 /* ============================================================
+   全屏背景 Canvas 动效层
+   飘带（明亮模式）/ 粒子场（暗色模式）
+   ============================================================ */
+#bg-ribbon-canvas,
+#bg-universe-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 0.5s ease;
+}
+
+/* 明亮模式：飘带可见、粒子隐藏 */
+#bg-ribbon-canvas  { opacity: 0.45; }
+#bg-universe-canvas { opacity: 0; }
+
+/* 暗色模式：粒子可见、飘带隐藏 */
+.dark #bg-ribbon-canvas  { opacity: 0; }
+.dark #bg-universe-canvas { opacity: 1; }
+
+/* ============================================================
    动画 keyframes
    ============================================================ */
 @keyframes shimmer {

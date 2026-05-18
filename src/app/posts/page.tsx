@@ -45,7 +45,7 @@ export default async function PostsPage() {
     <>
       <PublicHeader />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-14 bg-background">
         {posts.length === 0 ? (
           <EmptyState
             title="还没有文章"

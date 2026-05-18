@@ -37,7 +37,7 @@ export default async function MomentsPage() {
       <PublicHeader />
 
       {/* ===== 主内容区 — 与导航栏共享 max-w-6xl 基准线 ===== */}
-      <main className="relative mx-auto w-full max-w-6xl flex-1 overflow-hidden px-4 py-10 sm:px-6 sm:py-14 bg-dot-texture">
+      <main className="relative mx-auto w-full max-w-6xl flex-1 overflow-hidden px-4 py-10 sm:px-6 sm:py-14 bg-background bg-dot-texture">
 
         {/* ===== 装饰光球（右侧留白区域，毛玻璃呼吸动画） ===== */}
         {/* 天蓝色光球 — 右上方 */}

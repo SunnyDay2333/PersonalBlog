@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Caveat } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import { BackgroundEffects } from "@/components/shared/background-effects";
 import { Toaster } from "@/components/ui/sonner";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import "./globals.css";
@@ -49,6 +50,7 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <ThemeProvider>
+          <BackgroundEffects />
           {children}
           {/* Sonner Toast 通知组件（全局挂载） */}
           <Toaster
