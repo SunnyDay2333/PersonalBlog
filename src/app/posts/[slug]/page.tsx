@@ -88,7 +88,7 @@ export default async function PostPage({
 
       <main className="relative flex-1">
         <div className="relative mx-auto max-w-6xl px-4 pt-10 pb-20 sm:px-6 sm:pt-14">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_240px]">
+          <div className="grid gap-8 grid-cols-[minmax(0,1fr)_240px] max-lg:grid-cols-1">
             {/* 左 — 文章主体（max-w-[720px] 约束阅读宽度，标题和正文共享同一边缘） */}
             <article className="min-w-0 mx-auto max-w-[720px]">
               {/* 头部 */}
