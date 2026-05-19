@@ -39,7 +39,7 @@ export function PublicFooter() {
             className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
           >
             <BilibiliIcon className="h-3.5 w-3.5" />
-            BiliBili
+            bilibili
           </a>
         </nav>
       </div>

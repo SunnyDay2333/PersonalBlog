@@ -185,22 +185,23 @@ export function WalineComment({ path, compact = false }: WalineCommentProps) {
   }
 
   return (
-    <section className="mt-12 border-t border-border pt-8">
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <MessageCircle className="h-6 w-6 text-[#425AEF]" />
-          <h2 className="text-2xl font-bold text-foreground">评论</h2>
+    <section className="mt-8 sm:mt-12 border-t border-border pt-6 sm:pt-8">
+      <div className="mb-4 sm:mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6 text-[#425AEF]" />
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground">评论</h2>
         </div>
 
         {/* 匿名评论按钮 — 仅在 Waline 就绪后显示 */}
         {status === "ready" && (
           <button
             onClick={handleAnonymous}
-            className="group inline-flex items-center gap-1.5 rounded-full border border-border bg-gradient-to-br from-amber-400/10 to-orange-500/10 px-4 py-2 text-xs font-medium text-muted-foreground transition-all hover:border-amber-400/40 hover:text-foreground hover:shadow-sm active:scale-95"
+            className="group inline-flex items-center gap-1.5 rounded-full border border-border bg-gradient-to-br from-amber-400/10 to-orange-500/10 px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-medium text-muted-foreground transition-all hover:border-amber-400/40 hover:text-foreground hover:shadow-sm active:scale-95"
             title={`下次点击随机切换昵称，当前可生成："${randomNick}"`}
           >
-            <SparklesIcon className="h-3.5 w-3.5 text-amber-500 transition-transform group-hover:rotate-12" />
-            匿名评论
+            <SparklesIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-500 transition-transform group-hover:rotate-12" />
+            <span className="hidden sm:inline">匿名评论</span>
+            <span className="sm:hidden">匿名</span>
           </button>
         )}
       </div>

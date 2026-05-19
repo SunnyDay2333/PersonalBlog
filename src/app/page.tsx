@@ -99,7 +99,7 @@ export default async function HomePage() {
 
           {moments.length === 0 ? (
             <p className="py-8 text-center text-[14px] text-muted-foreground">
-              还没有说说，先去发布一条吧。
+              还没有说说，这里空空如也～。
             </p>
           ) : (
             <>

@@ -727,6 +727,65 @@ html[data-theme="dark"] .code-card-body [data-highlighted-line] {
   padding: 0.5rem 0 !important;
 }
 
+/* ---- Waline 移动端适配 ---- */
+@media (max-width: 640px) {
+  /* 输入区全宽，减少内边距 */
+  .wl-panel {
+    padding: 0.625rem !important;
+  }
+
+  /* 输入框字体放大（防止 iOS 缩放） */
+  .wl-editor,
+  .wl-input {
+    font-size: 16px !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+
+  /* 发布按钮更大（触摸友好） */
+  .wl-btn {
+    font-size: 0.8125rem !important;
+    padding: 0.5rem 1rem !important;
+    min-height: 36px !important;
+  }
+
+  /* 评论卡片间距收紧 */
+  .wl-card {
+    padding: 0.625rem 0 !important;
+  }
+  .wl-card .wl-comment {
+    padding: 0.375rem 0 !important;
+  }
+
+  /* 头像缩小 */
+  .wl-card .wl-user-avatar {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  /* 表情面板适配窄屏 */
+  .wl-emoji-popup {
+    max-width: 95vw !important;
+    max-height: 40vh !important;
+  }
+
+  /* 评论标题行 — 允许换行 */
+  .wl-header {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  /* 分页按钮放大（方便触摸） */
+  .wl-pagination button {
+    min-width: 32px !important;
+    min-height: 32px !important;
+  }
+
+  /* meta 信息（昵称/时间）更适合小屏 */
+  .wl-meta {
+    font-size: 0.75rem !important;
+  }
+}
+
 /* ============================================================
    首页时间轴（C 端）
    ============================================================ */
