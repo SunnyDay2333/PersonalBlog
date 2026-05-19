@@ -85,7 +85,7 @@ function HelloAbout() {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="relative mb-6 h-[240px] overflow-hidden rounded-3xl bg-[#2128bd] select-none sm:h-[280px]"
+      className="relative mb-6 h-[240px] overflow-hidden rounded-3xl bg-[#2128bd]/50 backdrop-blur-xl select-none sm:h-[280px]"
     >
       {/* 彩色跟随圆 */}
       {[
@@ -111,9 +111,12 @@ function HelloAbout() {
       ))}
 
       {/* mix-blend-screen 文字层 */}
-      <div className="absolute inset-0 z-10 flex items-center justify-center bg-white mix-blend-screen dark:bg-transparent">
-        <h1 className="text-[clamp(3rem,11vw,9rem)] font-bold leading-none tracking-tight text-black dark:text-white">
-          Hello there!
+      <div className="absolute inset-0 z-10 flex flex-col justify-center bg-white mix-blend-screen dark:bg-transparent">
+        <h1 className="self-start text-[clamp(3rem,11vw,9rem)] font-bold leading-none tracking-tight text-black dark:text-white">
+          Hello,
+        </h1>
+        <h1 className="self-end text-[clamp(3rem,11vw,9rem)] font-bold leading-none tracking-tight text-black dark:text-white">
+          there!
         </h1>
       </div>
     </motion.div>

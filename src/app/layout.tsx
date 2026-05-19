@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Caveat } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import { BackgroundEffects } from "@/components/shared/background-effects";
+import { BottomNavBar } from "@/components/layout/bottom-nav-bar";
 import { Toaster } from "@/components/ui/sonner";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import "./globals.css";
@@ -47,9 +49,12 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${caveat.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-background text-foreground">
+      <body className="flex min-h-full flex-col bg-background text-foreground pb-14 md:pb-0">
         <ThemeProvider>
+          <BackgroundEffects />
           {children}
+          {/* 移动端底部导航栏 */}
+          <BottomNavBar />
           {/* Sonner Toast 通知组件（全局挂载） */}
           <Toaster
             position="top-center"

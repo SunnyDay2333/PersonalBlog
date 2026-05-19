@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>说说页面 — 设计 Demo</title>
+<style>
+  /* ============================================================
+     Reset & CSS 变量（匹配项目 shadcn/ui 色彩体系）
+     ============================================================ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --background: #faf9f7;
+    --foreground: #1a1a1a;
+    --card: #ffffff;
+    --card-border: #eae7e3;
+    --muted: #f3f1ee;
+    --muted-foreground: #8c8c8c;
+    --border: #e0ddd8;
+    --accent-blue: #425AEF;
+    --lane-width: 72rem;           /* max-w-6xl = 1152px */
+    --sidebar-w: 180px;
+    --radius-xl: 16px;
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: transparent;
+    color: var(--foreground);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============================================================
+     Canvas 背景动效（飘带 — 匹配项目 bg-ribbon-canvas）
+     z-index: -1 确保在所有内容之后
+     ============================================================ */
+  #bg-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* ============================================================
+     导航栏 — 匹配 PublicHeader
+     max-w-6xl 居中，左导航右切换
+     ============================================================ */
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: 56px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    background: rgba(250, 249, 247, 0.65);
+    backdrop-filter: blur(20px) saturate(1.5);
+  }
+  .nav-inner {
+    width: var(--lane-width);
+    max-width: 100%;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+  }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a {
+    text-decoration: none;
+    font-size: 14px;
+    color: var(--muted-foreground);
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--foreground); }
+  .nav-links a.active { font-weight: 600; }
+  .nav-toggle {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--muted);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .nav-toggle:hover { background: var(--border); }
+
+  /* ============================================================
+     页面主体 — 全宽，透明底透出 canvas
+     ============================================================ */
+  .page-wrapper {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ============================================================
+     内容廊道 — 匹配导航栏宽度
+     用极淡的 box-shadow inset 替代硬边框
+     半透明乳白底，canvas 可透出
+     ============================================================ */
+  .content-lane {
+    width: var(--lane-width);
+    max-width: 100%;
+    margin: 0 auto;
+    min-height: calc(100vh - 56px);
+    position: relative;
+    background: rgba(255, 255, 255, 0.38);
+    box-shadow:
+      inset 1px 0 0 rgba(0,0,0,0.04),
+      inset -1px 0 0 rgba(0,0,0,0.04);
+  }
+
+  /* 廊道内点状纹理（叠加在透明底之上） */
+  .content-lane::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* 三列容器 */
+  .lane-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 40px 24px 80px;
+  }
+
+  /* ============================================================
+     左列 — 作者状态栏
+     固定在侧边，clean profile 风格（不似卡片）
+     ============================================================ */
+  .author-col {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    display: block;
+  }
+  .author-sticky {
+    position: sticky;
+    top: 88px;
+  }
+  .author-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px 12px 24px;
+    border-radius: var(--radius-xl);
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: box-shadow 0.3s, border-color 0.3s;
+  }
+  .author-block:hover {
+    box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+    border-color: rgba(0,0,0,0.08);
+  }
+  .author-avatar {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(0,0,0,0.05);
+    transition: border-color 0.3s;
+  }
+  .author-block:hover .author-avatar {
+    border-color: rgba(66,90,239,0.18);
+  }
+  .author-name {
+    margin-top: 12px;
+    font-size: 15px;
+    font-weight: 650;
+    color: var(--foreground);
+    letter-spacing: -0.01em;
+  }
+  .author-bio {
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--muted-foreground);
+    line-height: 1.5;
+    max-width: 140px;
+  }
+  /* 统计数 */
+  .author-stat {
+    margin-top: 18px;
+    padding-top: 16px;
+    width: 100%;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+  .author-stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted-foreground);
+  }
+  .author-stat-num {
+    margin-top: 3px;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--foreground);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ============================================================
+     中列 — 说说卡片流
+     ============================================================ */
+  .feed-col {
+    flex: 1;
+    max-width: 600px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  /* ============================================================
+     右列 — 光球装饰 + 呼吸动画
+     ============================================================ */
+  .decor-col {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    position: relative;
+  }
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    pointer-events: none;
+  }
+  .orb--sky {
+    width: 220px; height: 220px;
+    background: rgba(66, 90, 239, 0.12);
+    top: 60px;
+    right: -40px;
+    animation: orb-breathe-1 9s ease-in-out infinite;
+  }
+  .orb--sakura {
+    width: 180px; height: 180px;
+    background: rgba(245, 130, 155, 0.10);
+    top: 320px;
+    right: 10px;
+    animation: orb-breathe-2 11s ease-in-out infinite;
+  }
+  @keyframes orb-breathe-1 {
+    0%, 100% { transform: translate(0,0) scale(1); opacity: 0.7; }
+    35% { transform: translate(20px,-24px) scale(1.18); opacity: 1; }
+    65% { transform: translate(-10px,16px) scale(0.88); opacity: 0.5; }
+  }
+  @keyframes orb-breathe-2 {
+    0%, 100% { transform: translate(0,0) scale(1); opacity: 0.5; }
+    40% { transform: translate(-18px,-14px) scale(1.22); opacity: 0.85; }
+    70% { transform: translate(12px,20px) scale(0.85); opacity: 0.35; }
+  }
+
+  /* ============================================================
+     说说卡片
+     ============================================================ */
+  .moment-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-xl);
+    padding: 22px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 1px 8px rgba(0,0,0,0.03);
+    transition:
+      transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.35s ease,
+      border-color 0.3s ease;
+  }
+  .moment-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.03);
+    border-color: rgba(66,90,239,0.1);
+  }
+  /* Header */
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  .card-av {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(0,0,0,0.05);
+    flex-shrink: 0;
+  }
+  .card-author { font-size: 14px; font-weight: 600; }
+  .card-time { margin-left: auto; font-size: 12px; color: var(--muted-foreground); }
+  /* 正文 */
+  .card-body {
+    font-size: 15px;
+    line-height: 1.72;
+    color: var(--foreground);
+    white-space: pre-wrap;
+    margin-bottom: 16px;
+  }
+  /* Footer */
+  .card-footer {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    display: flex; gap: 24px;
+  }
+  .card-footer button {
+    display: inline-flex; align-items: center; gap: 5px;
+    border: none; background: none;
+    font-size: 13px; color: var(--muted-foreground);
+    cursor: pointer; padding: 4px 8px; border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .card-footer button:hover {
+    color: var(--accent-blue);
+    background: rgba(66,90,239,0.05);
+  }
+
+  /* ============================================================
+     图片网格
+     ============================================================ */
+  .img-grid { display: grid; gap: 4px; border-radius: 10px; overflow: hidden; }
+  .img-grid.c1 { grid-template-columns: 1fr; }
+  .img-grid.c1 .img-cell { max-width: 62%; aspect-ratio: 4/3; }
+  .img-grid.c2 { grid-template-columns: 1fr 1fr; }
+  .img-grid.c3 { grid-template-columns: 1fr 1fr 1fr; }
+  .img-grid.c4 { grid-template-columns: 1fr 1fr; }
+  .img-grid.c5,
+  .img-grid.c6 { grid-template-columns: 1fr 1fr 1fr; }
+  .img-grid.c7,
+  .img-grid.c8,
+  .img-grid.c9 { grid-template-columns: 1fr 1fr 1fr; }
+  /* 多张时正方形 */
+  .img-grid.c2 .img-cell,
+  .img-grid.c3 .img-cell,
+  .img-grid.c4 .img-cell,
+  .img-grid.c5 .img-cell,
+  .img-grid.c6 .img-cell,
+  .img-grid.c7 .img-cell,
+  .img-grid.c8 .img-cell,
+  .img-grid.c9 .img-cell { aspect-ratio: 1; }
+
+  .img-cell {
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #eeebe6;
+    cursor: pointer;
+  }
+  .img-cell img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+  }
+  .img-cell:hover img { transform: scale(1.06); }
+  .img-cell .plus-n {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.4);
+    color: #fff; font-size: 21px; font-weight: 700;
+    pointer-events: none;
+  }
+
+  /* ============================================================
+     年份分割线
+     ============================================================ */
+  .year-split {
+    display: flex; align-items: center; gap: 14px;
+    padding: 4px 0;
+    margin: 6px 0 2px;
+  }
+  .year-split::before,
+  .year-split::after {
+    content: ""; flex: 1; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(0,0,0,0.07), transparent);
+  }
+  .year-split span {
+    font-size: 12px; font-weight: 600;
+    color: var(--muted-foreground);
+    letter-spacing: 0.05em;
+  }
+
+  /* Empty */
+  .empty {
+    text-align: center; padding: 80px 0; color: var(--muted-foreground);
+  }
+
+  /* Footer — 匹配 PublicFooter */
+  .page-footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 32px 24px 48px;
+    font-size: 12px;
+    color: var(--muted-foreground);
+    border-top: 1px solid rgba(0,0,0,0.05);
+    background: rgba(255, 255, 255, 0.38);
+    width: var(--lane-width);
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  /* ============================================================
+     响应式
+     ============================================================ */
+  @media (max-width: 1100px) {
+    .author-col, .decor-col { display: none; }
+    .lane-inner { padding: 24px 16px 60px; }
+    .feed-col { max-width: 100%; }
+    .content-lane { box-shadow: none; background: rgba(255,255,255,0.2); }
+  }
+  @media (max-width: 640px) {
+    .nav-links { gap: 16px; }
+    .nav-links a { font-size: 13px; }
+    .lane-inner { padding: 16px 10px 48px; gap: 0; }
+    .moment-card { border-radius: var(--radius-lg); padding: 16px; }
+    .img-grid.c1 .img-cell { max-width: 85%; }
+    .feed-col { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- ===== 导航栏 ===== -->
+<header class="nav-bar">
+  <div class="nav-inner">
+    <nav class="nav-links">
+      <a href="#">主页</a>
+      <a href="#">文章</a>
+      <a href="#" class="active">说说</a>
+      <a href="#">关于</a>
+    </nav>
+    <button class="nav-toggle" title="切换主题">🌓</button>
+  </div>
+</header>
+
+<!-- ===== 页面主体 ===== -->
+<div class="page-wrapper">
+
+  <div class="content-lane">
+    <div class="lane-inner">
+
+      <!-- ===== 左：作者状态栏 ===== -->
+      <aside class="author-col">
+        <div class="author-sticky">
+          <div class="author-block">
+            <img class="author-avatar"
+                 src="https://avatars.githubusercontent.com/u/144646414?v=4"
+                 alt="自然晴" />
+            <p class="author-name">自然晴</p>
+            <p class="author-bio">用代码和文字记录生活的点滴</p>
+            <div class="author-stat">
+              <p class="author-stat-label">碎碎念</p>
+              <p class="author-stat-num">5</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ===== 中：卡片流 ===== -->
+      <div class="feed-col">
+
+        <div class="year-split"><span>2026</span></div>
+
+        <!-- 单图 -->
+        <article class="moment-card">
+          <div class="card-header">
+            <img class="card-av" src="https://avatars.githubusercontent.com/u/144646414?v=4" alt="">
+            <span class="card-author">自然晴</span>
+            <span class="card-time">5 小时前</span>
+          </div>
+          <div class="card-body">今天的夕阳特别好看，粉紫色的天空，像一幅水彩画。分享给你们 🌇</div>
+          <div class="img-grid c1">
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=800&h=600&fit=crop" alt=""></div>
+          </div>
+          <div class="card-footer">
+            <button>💬 评论</button>
+            <button>❤️ 喜欢</button>
+          </div>
+        </article>
+
+        <!-- 纯文本 -->
+        <article class="moment-card">
+          <div class="card-header">
+            <img class="card-av" src="https://avatars.githubusercontent.com/u/144646414?v=4" alt="">
+            <span class="card-author">自然晴</span>
+            <span class="card-time">昨天</span>
+          </div>
+          <div class="card-body">终于把那个棘手的 bug 解决了。原来是一个竞态条件，花了两天时间排查。写代码有时候就像侦探破案，线索往往藏在最不起眼的地方。</div>
+          <div class="card-footer">
+            <button>💬 评论</button>
+            <button>❤️ 喜欢</button>
+          </div>
+        </article>
+
+        <!-- 4 张图 -->
+        <article class="moment-card">
+          <div class="card-header">
+            <img class="card-av" src="https://avatars.githubusercontent.com/u/144646414?v=4" alt="">
+            <span class="card-author">自然晴</span>
+            <span class="card-time">3 天前</span>
+          </div>
+          <div class="card-body">周末咖啡馆打卡 ☕ 藏在巷子里的手冲店，豆子很新鲜。</div>
+          <div class="img-grid c4">
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&h=400&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=400&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=400&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?w=400&h=400&fit=crop" alt=""></div>
+          </div>
+          <div class="card-footer">
+            <button>💬 3 条评论</button>
+            <button>❤️ 喜欢</button>
+          </div>
+        </article>
+
+        <div class="year-split"><span>2025</span></div>
+
+        <!-- 9 张图 -->
+        <article class="moment-card">
+          <div class="card-header">
+            <img class="card-av" src="https://avatars.githubusercontent.com/u/144646414?v=4" alt="">
+            <span class="card-author">自然晴</span>
+            <span class="card-time">2025年12月</span>
+          </div>
+          <div class="card-body">2025 年度总结：47 篇文章，23 本书，6 个城市。最大的收获是学会了慢下来。</div>
+          <div class="img-grid c9">
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1518173946687-a1e4e3e6a4b0?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=300&h=300&fit=crop" alt=""></div>
+          </div>
+          <div class="card-footer">
+            <button>💬 12 条评论</button>
+            <button>❤️ 喜欢</button>
+          </div>
+        </article>
+
+        <!-- 12 张图（+3） -->
+        <article class="moment-card">
+          <div class="card-header">
+            <img class="card-av" src="https://avatars.githubusercontent.com/u/144646414?v=4" alt="">
+            <span class="card-author">自然晴</span>
+            <span class="card-time">2025年10月</span>
+          </div>
+          <div class="card-body">秋日京都 🍁 枫叶季，手机随手一拍都是壁纸级别。</div>
+          <div class="img-grid c9">
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell"><img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=300&h=300&fit=crop" alt=""></div>
+            <div class="img-cell">
+              <img src="https://images.unsplash.com/photo-1509773896067-3852f3e1c094?w=300&h=300&fit=crop" alt="">
+              <div class="plus-n">+3</div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button>💬 8 条评论</button>
+            <button>❤️ 喜欢</button>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- ===== 右：光球装饰 ===== -->
+      <div class="decor-col">
+        <div class="orb orb--sky"></div>
+        <div class="orb orb--sakura"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== Footer ===== -->
+  <footer class="page-footer">
+    © 2026 自然晴 · 用代码和文字记录生活
+  </footer>
+
+</div>
+
+<!-- ============================================================
+     Canvas 飘带动画
+     ============================================================ -->
+<script>
+(function(){
+  const c = document.getElementById('bg-canvas');
+  const ctx = c.getContext('2d');
+  let W, H;
+  function size() { W = c.width = innerWidth; H = c.height = innerHeight; }
+  addEventListener('resize', size); size();
+
+  const ribbons = [];
+  for (let i = 0; i < 4; i++) {
+    ribbons.push({
+      x1: Math.random() * W, y1: Math.random() * H,
+      x2: Math.random() * W, y2: Math.random() * H,
+      x3: Math.random() * W, y3: Math.random() * H,
+      x4: Math.random() * W, y4: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+      hue: [220, 250, 340, 200][i],
+      w: 140 + Math.random() * 240,
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (const r of ribbons) {
+      for (const k of ['x1','x2','x3','x4']) { r[k] += r.vx * (k.endsWith('2')||k.endsWith('3')?1.1:1); }
+      for (const k of ['y1','y2','y3','y4']) { r[k] += r.vy * (k.endsWith('2')||k.endsWith('4')?0.8:1); }
+      for (const k of ['x1','x2','x3','x4']) { if (r[k]<-300) r[k]=W+300; if (r[k]>W+300) r[k]=-300; }
+      for (const k of ['y1','y2','y3','y4']) { if (r[k]<-300) r[k]=H+300; if (r[k]>H+300) r[k]=-300; }
+
+      ctx.beginPath();
+      ctx.moveTo(r.x1, r.y1);
+      ctx.bezierCurveTo(r.x2, r.y2, r.x3, r.y3, r.x4, r.y4);
+      const alpha = [0.05,0.04,0.03,0.04][ribbons.indexOf(r)];
+      ctx.strokeStyle = `hsla(${r.hue},60%,65%,${alpha})`;
+      ctx.lineWidth = r.w;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+
+</body>
+</html>

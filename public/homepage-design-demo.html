@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>首页设计 Demo</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #faf9f7;
+    --card: #ffffff;
+    --card-border: #e8e5e0;
+    --text: #1a1a1a;
+    --text-secondary: #6b6b6b;
+    --text-muted: #999999;
+    --accent: #425AEF;
+    --accent-soft: rgba(66, 90, 239, 0.06);
+    --radius-xl: 16px;
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: transparent;
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #bg-canvas {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: -1;
+  }
+
+  /* ===== 导航栏 ===== */
+  .nav { position: sticky; top: 0; z-index: 50; height: 56px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    background: rgba(250,249,247,0.65);
+    backdrop-filter: blur(20px) saturate(1.5);
+    display: flex; align-items: center; justify-content: center; }
+  .nav-inner { width: 1152px; max-width: 100%; display: flex; align-items: center;
+    justify-content: space-between; padding: 0 24px; }
+  .nav-l { display: flex; gap: 28px; }
+  .nav-l a { text-decoration: none; font-size: 14px; color: var(--text-secondary); transition: color 0.2s; }
+  .nav-l a:hover, .nav-l a.active { color: var(--text); }
+  .nav-l a.active { font-weight: 600; }
+  .nav-toggle { width: 34px; height: 34px; border-radius: 50%;
+    background: #f3f1ee; border: 1px solid #e0ddd8; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; }
+
+  .wrapper { position: relative; z-index: 1; }
+  .content-lane { width: 1152px; max-width: 100%; margin: 0 auto;
+    min-height: calc(100vh - 56px); background: rgba(255,255,255,0.38);
+    box-shadow: inset 1px 0 0 rgba(0,0,0,0.04), inset -1px 0 0 rgba(0,0,0,0.04); }
+  .lane-inner { padding: 0 24px 80px; }
+
+  /* ===== Hero — 保持现有设计 ===== */
+  .hero { position: relative; overflow: hidden; border-bottom: 1px solid rgba(0,0,0,0.06); }
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23dbeafe"/><stop offset="50%" stop-color="%23ede9fe"/><stop offset="100%" stop-color="%23fce7f3"/></linearGradient></defs><rect fill="url(%23g)" width="1200" height="600"/></svg>');
+    background-size: cover; background-position: center;
+  }
+  .hero-overlay { position: absolute; inset: 0; z-index: 1; background: rgba(255,255,255,0.55); }
+  .hero-content { position: relative; z-index: 2; max-width: 800px; margin: 0 auto;
+    text-align: center; padding: 72px 24px; }
+  .hero-tag { display: inline-flex; align-items: center; gap: 6px;
+    border-radius: 999px; border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(255,255,255,0.6); backdrop-filter: blur(8px);
+    padding: 5px 14px; font-size: 12px; color: var(--text-secondary); margin-bottom: 24px; }
+  .hero h1 { font-size: 52px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+  .hero h1 .accent { background: linear-gradient(135deg, #425AEF 0%, #8b5cf6 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero-sub { margin-top: 16px; font-size: 18px; color: var(--text-secondary); }
+  .hero-actions { margin-top: 32px; display: flex; justify-content: center; gap: 12px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px;
+    border-radius: 999px; padding: 10px 24px; font-size: 14px; font-weight: 500;
+    text-decoration: none; transition: all 0.2s; cursor: pointer; }
+  .btn-primary { background: #1a1a1a; color: #fff; border: none; }
+  .btn-primary:hover { background: #333; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+  .btn-outline { background: rgba(255,255,255,0.5); color: var(--text);
+    border: 1px solid rgba(0,0,0,0.1); backdrop-filter: blur(8px); }
+  .btn-outline:hover { background: rgba(255,255,255,0.8); border-color: rgba(0,0,0,0.18); }
+
+  /* ===== 区块标题 ===== */
+  .section-head { display: flex; align-items: center; gap: 16px; padding: 56px 0 28px; }
+  .section-head::after { content: ""; flex: 1; height: 1px;
+    background: linear-gradient(to right, rgba(0,0,0,0.08), transparent); }
+  .section-head h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em;
+    white-space: nowrap; display: flex; align-items: center; gap: 10px; }
+  .section-head h2 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .section-head .count { font-size: 13px; font-weight: 500; color: var(--text-muted);
+    background: rgba(0,0,0,0.04); padding: 2px 10px; border-radius: 999px; }
+
+  /* ===== 说说横向卡片条 ===== */
+  .moments-strip { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px;
+    scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; }
+  .moments-strip::-webkit-scrollbar { display: none; }
+  .moment-mini { flex: 0 0 280px; scroll-snap-align: start;
+    border-radius: var(--radius-xl); border: 1px solid var(--card-border);
+    background: var(--card); padding: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+    cursor: pointer; text-decoration: none; color: inherit; display: block; }
+  .moment-mini:hover { transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06); border-color: rgba(66,90,239,0.12); }
+  .moment-mini-time { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+  .moment-mini-text { font-size: 14px; line-height: 1.6; color: var(--text);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .moment-mini-imgs { display: flex; gap: 4px; margin-top: 10px; }
+  .moment-mini-imgs img { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; }
+  .moment-mini-imgs .more { display: flex; align-items: center; justify-content: center;
+    width: 60px; height: 60px; border-radius: 6px; background: rgba(0,0,0,0.04);
+    font-size: 12px; color: var(--text-muted); }
+
+  /* ===== 查看更多链接 ===== */
+  .view-all { display: flex; justify-content: flex-end; padding-top: 20px; }
+  .view-all a { font-size: 13px; color: var(--accent); text-decoration: none;
+    display: inline-flex; align-items: center; gap: 4px; font-weight: 500;
+    transition: gap 0.2s; }
+  .view-all a:hover { gap: 8px; }
+
+  /* ===== 文章首篇大卡片 ===== */
+  .article-featured { display: flex; flex-direction: column;
+    border-radius: var(--radius-xl); border: 1px solid var(--card-border);
+    background: var(--card); overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+    text-decoration: none; color: inherit; }
+  .article-featured:hover { transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.07); border-color: rgba(66,90,239,0.12); }
+  .article-featured-img { height: 280px; background: #e8e5e0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 64px; color: rgba(0,0,0,0.06); overflow: hidden; }
+  .article-featured-img img { width: 100%; height: 100%; object-fit: cover; }
+  .article-featured-body { padding: 28px; }
+  .article-featured-body time { font-size: 12px; color: var(--text-muted); }
+  .article-featured-body h3 { margin-top: 10px; font-size: 24px; font-weight: 700;
+    line-height: 1.3; letter-spacing: -0.01em; }
+  .article-featured-body p { margin-top: 8px; font-size: 15px; line-height: 1.6;
+    color: var(--text-secondary); display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  @media (min-width: 640px) { .article-featured { flex-direction: row; }
+    .article-featured-img { width: 340px; height: auto; min-height: 240px; flex-shrink: 0; }
+    .article-featured-body { display: flex; flex-direction: column; justify-content: center; } }
+
+  /* ===== 文章网格（2列） ===== */
+  .articles-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 20px; }
+  @media (min-width: 640px) { .articles-grid { grid-template-columns: 1fr 1fr; } }
+  .article-card { border-radius: var(--radius-lg); border: 1px solid var(--card-border);
+    background: var(--card); padding: 22px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+    text-decoration: none; color: inherit; display: flex; flex-direction: column; }
+  .article-card:hover { transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06); border-color: rgba(66,90,239,0.12); }
+  .article-card time { font-size: 11px; color: var(--text-muted); }
+  .article-card h3 { margin-top: 8px; font-size: 16px; font-weight: 650;
+    line-height: 1.4; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .article-card p { margin-top: 6px; font-size: 13px; line-height: 1.55;
+    color: var(--text-secondary); display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .article-card .meta { margin-top: auto; padding-top: 14px;
+    font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+  /* 无封面图时的占位色块 */
+  .article-card .cover-strip { height: 4px; border-radius: 2px; margin-bottom: 14px;
+    background: linear-gradient(90deg, #425AEF 0%, #8b5cf6 50%, #f472b6 100%); opacity: 0.6; }
+
+  /* ===== Footer ===== */
+  .footer { text-align: center; padding: 40px 24px 60px; font-size: 12px;
+    color: var(--text-muted); border-top: 1px solid rgba(0,0,0,0.05);
+    width: 1152px; max-width: 100%; margin: 0 auto;
+    background: rgba(255,255,255,0.38); }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 34px; }
+    .hero-sub { font-size: 15px; }
+    .hero-content { padding: 48px 16px; }
+    .moment-mini { flex: 0 0 240px; }
+    .lane-inner { padding: 0 14px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- 导航栏 -->
+<header class="nav">
+  <div class="nav-inner">
+    <nav class="nav-l">
+      <a href="#" class="active">主页</a><a href="#">文章</a><a href="#">说说</a><a href="#">关于</a>
+    </nav>
+    <button class="nav-toggle">🌓</button>
+  </div>
+</header>
+
+<div class="wrapper">
+  <div class="content-lane">
+
+    <!-- ===== Hero ===== -->
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-tag">✨ Hi there!</div>
+        <h1>I'm <span class="accent">自然晴</span></h1>
+        <p class="hero-sub">Hope is the thing with feathers.</p>
+        <div class="hero-actions">
+          <a href="#" class="btn btn-primary">认识我 →</a>
+          <a href="#" class="btn btn-outline">GitHub</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="lane-inner">
+
+      <!-- ===== 最近说说 ===== -->
+      <div class="section-head">
+        <h2><span class="dot"></span>最近说说</h2>
+        <span class="count">5 条</span>
+      </div>
+
+      <div class="moments-strip">
+        <!-- 说说1 -->
+        <a href="#" class="moment-mini">
+          <div class="moment-mini-time">5 小时前</div>
+          <div class="moment-mini-text">今天的夕阳特别好看，粉紫色的天空，像一幅水彩画。分享给你们 🌇</div>
+          <div class="moment-mini-imgs">
+            <img src="https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=120&h=120&fit=crop" alt="">
+          </div>
+        </a>
+        <!-- 说说2（纯文本） -->
+        <a href="#" class="moment-mini">
+          <div class="moment-mini-time">昨天</div>
+          <div class="moment-mini-text">终于把那个棘手的 bug 解决了。花了两天时间排查，写代码有时候就像侦探破案。</div>
+        </a>
+        <!-- 说说3（3张图） -->
+        <a href="#" class="moment-mini">
+          <div class="moment-mini-time">3 天前</div>
+          <div class="moment-mini-text">周末咖啡馆打卡 ☕ 藏在巷子里的手冲店，豆子很新鲜。</div>
+          <div class="moment-mini-imgs">
+            <img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=120&h=120&fit=crop" alt="">
+            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=120&h=120&fit=crop" alt="">
+            <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=120&h=120&fit=crop" alt="">
+          </div>
+        </a>
+        <!-- 说说4 -->
+        <a href="#" class="moment-mini">
+          <div class="moment-mini-time">5 天前</div>
+          <div class="moment-mini-text">新学了一个框架，写了个小 demo，成就感满满 🚀</div>
+        </a>
+        <!-- 说说5 -->
+        <a href="#" class="moment-mini">
+          <div class="moment-mini-time">1 周前</div>
+          <div class="moment-mini-text">秋天快到了，天气转凉，大家记得添衣服 🍂</div>
+        </a>
+      </div>
+
+      <div class="view-all">
+        <a href="#">查看全部说说 →</a>
+      </div>
+
+      <!-- ===== 最新文章 ===== -->
+      <div class="section-head">
+        <h2><span class="dot"></span>最新文章</h2>
+        <span class="count">5 篇</span>
+      </div>
+
+      <!-- 首篇大卡片 -->
+      <a href="#" class="article-featured">
+        <div class="article-featured-img">
+          <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=680&h=400&fit=crop" alt="">
+        </div>
+        <div class="article-featured-body">
+          <time>2026 年 05 月 15 日</time>
+          <h3>使用 Next.js 16 构建现代化博客的完整指南</h3>
+          <p>从零开始搭建一个支持 Markdown 渲染、暗色模式、全文搜索的个人博客系统。涵盖 App Router、Server Components、Supabase 集成等核心主题。</p>
+        </div>
+      </a>
+
+      <!-- 其余文章 2 列网格 -->
+      <div class="articles-grid">
+        <a href="#" class="article-card">
+          <div class="cover-strip"></div>
+          <time>2026 年 05 月 10 日</time>
+          <h3>TypeScript 5 类型体操：从入门到放弃再到掌握</h3>
+          <p>深入理解 TypeScript 的类型系统，通过实际案例掌握条件类型、模板字面量类型等高级特性。</p>
+          <div class="meta">📅 2026年05月10日</div>
+        </a>
+        <a href="#" class="article-card">
+          <div class="cover-strip"></div>
+          <time>2026 年 05 月 05 日</time>
+          <h3>Tailwind CSS v4 新特性一览：更快、更轻、更灵活</h3>
+          <p>Tailwind CSS v4 带来了全新的配置方式、CSS-first 架构和显著的性能提升。本文逐一解析关键变化。</p>
+          <div class="meta">📅 2026年05月05日</div>
+        </a>
+        <a href="#" class="article-card">
+          <div class="cover-strip"></div>
+          <time>2026 年 04 月 28 日</time>
+          <h3>Supabase RLS 实战：为你的应用构建数据库级安全策略</h3>
+          <p>Row Level Security 是 Supabase 最强大的特性之一。本文通过实际场景演示如何设计安全策略。</p>
+          <div class="meta">📅 2026年04月28日</div>
+        </a>
+        <a href="#" class="article-card">
+          <div class="cover-strip"></div>
+          <time>2026 年 04 月 20 日</time>
+          <h3>从零实现一个 Markdown 编辑器：TipTap + ProseMirror 深度解析</h3>
+          <p>了解 ProseMirror 的 Schema、Plugin 和 NodeView 机制，构建支持数学公式和代码高亮的编辑器。</p>
+          <div class="meta">📅 2026年04月20日</div>
+        </a>
+      </div>
+
+      <div class="view-all">
+        <a href="#">查看全部文章 →</a>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="footer">© 2026 自然晴 · 用代码和文字记录生活</footer>
+</div>
+
+<!-- Canvas 飘带动效 -->
+<script>
+(function(){
+  const c=document.getElementById('bg-canvas'),ctx=c.getContext('2d');
+  let W,H;
+  function s(){W=c.width=innerWidth;H=c.height=innerHeight}
+  addEventListener('resize',s);s();
+  const r=[];
+  for(let i=0;i<4;i++)r.push({
+    x1:Math.random()*W,y1:Math.random()*H,x2:Math.random()*W,y2:Math.random()*H,
+    x3:Math.random()*W,y3:Math.random()*H,x4:Math.random()*W,y4:Math.random()*H,
+    vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,h:[220,250,340,200][i],w:140+Math.random()*240
+  });
+  function d(){
+    ctx.clearRect(0,0,W,H);
+    for(const o of r){
+      for(const k of['x1','x2','x3','x4'])o[k]+=o.vx*1;
+      for(const k of['y1','y2','y3','y4'])o[k]+=o.vy*.8;
+      for(const k of['x1','x2','x3','x4']){if(o[k]<-300)o[k]=W+300;if(o[k]>W+300)o[k]=-300}
+      for(const k of['y1','y2','y3','y4']){if(o[k]<-300)o[k]=H+300;if(o[k]>H+300)o[k]=-300}
+      ctx.beginPath();ctx.moveTo(o.x1,o.y1);ctx.bezierCurveTo(o.x2,o.y2,o.x3,o.y3,o.x4,o.y4);
+      ctx.strokeStyle=`hsla(${o.h},60%,65%,${[.05,.04,.03,.04][r.indexOf(o)]})`;
+      ctx.lineWidth=o.w;ctx.lineCap='round';ctx.stroke();
+    }
+    requestAnimationFrame(d);
+  }
+  d();
+})();
+</script>
+</body>
+</html>

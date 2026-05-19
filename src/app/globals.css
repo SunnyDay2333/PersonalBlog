@@ -612,6 +612,30 @@ html[data-theme="dark"] .code-card-body [data-highlighted-line] {
 
 
 /* ============================================================
+   全屏背景 Canvas 动效层
+   飘带（明亮模式）/ 粒子场（暗色模式）
+   ============================================================ */
+#bg-ribbon-canvas,
+#bg-universe-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 0.5s ease;
+}
+
+/* 明亮模式：飘带可见、粒子隐藏 */
+#bg-ribbon-canvas  { opacity: 0.45; }
+#bg-universe-canvas { opacity: 0; }
+
+/* 暗色模式：粒子可见、飘带隐藏 */
+.dark #bg-ribbon-canvas  { opacity: 0; }
+.dark #bg-universe-canvas { opacity: 1; }
+
+/* ============================================================
    动画 keyframes
    ============================================================ */
 @keyframes shimmer {
@@ -693,14 +717,73 @@ html[data-theme="dark"] .code-card-body [data-highlighted-line] {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08) !important;
 }
 
-/* 隐藏 Waline 顶部多余的计数 header（紧凑模式不需要） */
-.wl-header {
+/* Waline header 内的计数隐藏（输入框在 header 内，不能整个隐藏） */
+.wl-header .wl-count {
   display: none !important;
 }
 
 /* 调整评论区整体间距 */
 .wl-comment {
   padding: 0.5rem 0 !important;
+}
+
+/* ---- Waline 移动端适配 ---- */
+@media (max-width: 640px) {
+  /* 输入区全宽，减少内边距 */
+  .wl-panel {
+    padding: 0.625rem !important;
+  }
+
+  /* 输入框字体放大（防止 iOS 缩放） */
+  .wl-editor,
+  .wl-input {
+    font-size: 16px !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+
+  /* 发布按钮更大（触摸友好） */
+  .wl-btn {
+    font-size: 0.8125rem !important;
+    padding: 0.5rem 1rem !important;
+    min-height: 36px !important;
+  }
+
+  /* 评论卡片间距收紧 */
+  .wl-card {
+    padding: 0.625rem 0 !important;
+  }
+  .wl-card .wl-comment {
+    padding: 0.375rem 0 !important;
+  }
+
+  /* 头像缩小 */
+  .wl-card .wl-user-avatar {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  /* 表情面板适配窄屏 */
+  .wl-emoji-popup {
+    max-width: 95vw !important;
+    max-height: 40vh !important;
+  }
+
+  /* 评论标题行 — 允许换行 */
+  .wl-header {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  /* 分页按钮放大（方便触摸） */
+  .wl-pagination button {
+    min-width: 32px !important;
+    min-height: 32px !important;
+  }
+
+  /* meta 信息（昵称/时间）更适合小屏 */
+  .wl-meta {
+    font-size: 0.75rem !important;
+  }
 }
 
 /* ============================================================
@@ -1086,4 +1169,12 @@ html[data-theme="dark"] .code-card-body [data-highlighted-line] {
     0 8px 30px rgba(0, 0, 0, 0.3),
     0 2px 8px rgba(0, 0, 0, 0.2);
   border-color: oklch(1 0 0 / 0.15);
+}
+
+/* 隐藏滚动条（横向滚动容器用） */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
