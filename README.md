@@ -1,179 +1,469 @@
-# Sunnyday's Blog
-
-一个记录思考与代码的个人博客，基于 Next.js 16 + Supabase + TipTap 构建。
-
----
-
-## 技术栈
-
-| 层 | 技术 |
-|---|------|
-| 框架 | Next.js 16（App Router + Server Components） |
-| 语言 | TypeScript 5 |
-| 样式 | Tailwind CSS v4 + shadcn/ui |
-| 数据库 | Supabase（PostgreSQL + RLS + Storage） |
-| 认证 | Supabase Auth（邮箱密码登录） |
-| 富文本编辑器 | TipTap（StarterKit + CodeBlock + Mathematics） |
-| Markdown 渲染 | react-markdown + rehype-pretty-code（Shiki） + KaTeX |
-| 评论 | Waline |
-| 动画 | Framer Motion + tw-animate-css |
-| 通知 | Sonner |
+<p align="center">
+  <h1 align="center">Sunnyday's Blog</h1>
+  <p align="center">
+    A modern, full-stack personal blog with a WYSIWYG editor, markdown rendering, and comments.
+    <br />
+    <a href="https://sunnyday2333.com"><strong>Live Demo »</strong></a>
+    <br />
+    <br />
+    <img src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" alt="Next.js 16" />
+    <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" alt="React 19" />
+    <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript" alt="TypeScript 5" />
+    <img src="https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?logo=supabase" alt="Supabase" />
+    <img src="https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss" alt="Tailwind CSS v4" />
+    <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License" />
+  </p>
+</p>
 
 ---
 
-## 功能概览
+## ✨ Features
 
-### 前台（C 端）
+### Public Site
 
-- **首页** — Hero 封面区 + 打字机动画 + 时间线式文章列表（带年份分组）
-- **文章列表** — 按年份归档、侧边栏导航、滚动到顶按钮
-- **文章详情** — 全功能 Markdown 渲染：
-  - GFM 表格 / 任务列表
-  - Shiki 语法高亮代码块（Mac 风格顶部栏 + 行号 + 一键复制）
-  - LaTeX 数学公式（KaTeX 预渲染，行内 + 块级）
-  - 中文标题锚点链接 + 右侧 ToC 目录导航
-  - 毛玻璃模糊雾化效果（非活跃标题）
-  - PDF 内嵌预览
-- **关于页** — 个人介绍、技术栈、兴趣爱好、联系方式
-- **评论系统** — Waline 驱动，支持表情 / 图片 / 登录
-- **亮暗主题** — next-themes 驱动，代码块颜色随主题平滑切换
-- **响应式** — 移动端适配 ToC 折叠、表格横向滚动
+- **Homepage** — Hero section with typewriter animation, timeline-style article list grouped by year
+- **Article Archive** — Year-grouped archive with sidebar navigation, scroll-to-top button
+- **Article Detail** — Full-featured Markdown rendering:
+  - GFM tables / task lists
+  - Shiki syntax-highlighted code blocks (macOS-style title bar + line numbers + one-click copy)
+  - LaTeX math formulas (KaTeX pre-rendering, inline + block)
+  - Anchored headings with frosted-glass ToC sidebar navigation
+  - Embedded PDF preview
+- **About Page** — Personal intro, tech stack, interests, contact
+- **Comments** — Waline-powered, supports emoji / images / social login
+- **Theme** — Light / dark mode via next-themes, smooth code block color transitions
+- **Mobile Responsive** — Collapsible ToC, scrollable tables, bottom tab bar
 
-### 后台管理（Admin 端 / `/admin`）
+### Admin Dashboard (`/admin`)
 
-- **登录认证** — Supabase Auth 邮箱密码登录 + AuthGuard 路由守卫 + RLS 策略
-- **仪表盘** — 文章统计（总数 / 已发布 / 草稿）
-- **文章管理** — 列表展示 + 状态徽章 + 批量操作
-- **文章编辑器** — TipTap WYSIWYG 富文本：
-  - 工具栏：加粗 / 斜体 / 删除线 / 行内代码 / 标题(H1-H6)
-  - 无序列表 / 有序列表 / 引用 / 分割线
-  - **代码块**：40+ 语言支持，lowlight 语法高亮，语言选择下拉框
-  - **数学公式**：KaTeX 实时渲染，点击可编辑源码（Enter/失焦提交）
-  - **表格**：可视化行/列选择插入
-  - 图片上传（Base64 内联）、本地 .md 文件导入
-  - Markdown 快捷键：Ctrl+B/I/K/Z/Y、Ctrl+1~6 标题、Ctrl+7 正文
-- **自动保存** — 3 秒防抖自动存为草稿 + 手动保存 + 发布 / 更新
-- **文章创建** — 空白撰写 或 上传 .md 文件双入口
-- **封面图管理** — 上传至 Supabase Storage + 浏览已上传封面 + URL 粘贴
-- **设置页** — 管理员信息展示
-- **样式隔离** — 编辑器 CSS 仅 admin 路由加载，不污染前台
+- **Authentication** — Email/password login via Supabase Auth + proxy guard + RLS policies
+- **Dashboard** — Article stats (total / published / draft)
+- **Article Editor** — TipTap WYSIWYG:
+  - Toolbar: bold / italic / strikethrough / inline code / headings (H1–H6)
+  - **Code blocks**: 40+ languages, lowlight highlighting, language selector
+  - **Math formulas**: KaTeX live preview, click to edit source (Enter/blur to confirm)
+  - **Tables**: visual row/column grid picker
+  - Image upload (base64 inline), local .md file import
+  - Markdown shortcuts: Ctrl+B/I/K/Z/Y, Ctrl+1–6 for headings
+- **Auto-save** — 3-second debounce draft saving + manual save + publish
+- **Cover Image** — Upload to Supabase Storage + browse existing covers + URL paste
+- **Settings Page** — Admin profile management
 
 ---
 
-## 数据架构
+## 🧱 Tech Stack
 
-### 数据库（Supabase PostgreSQL）
-
-```
-auth.users ──1:1──> profiles ──1:N──> posts ──N:M──> categories
-```
-
-- `posts` 表：存储 Markdown 原始内容，支持草稿 / 已发布 / 已归档状态
-- `profiles` 表：与 Supabase Auth 自动同步，注册时触发创建
-- `categories` + `post_categories`：多对多分类关联
-- RLS 策略：已发布文章公开可读，认证用户可管理自己的文章
-
-### Markdown 数据流
-
-```
-【保存】编辑器 → getHTML → Turndown（围栏代码块 + 数学公式 + 反斜杠归一化） → Markdown → Supabase
-【加载】Supabase → Markdown → 数学公式预转换 → marked → setContent → TipTap 实时渲染
-【展示】Supabase → KaTeX 预渲染 → react-markdown → rehype-pretty-code(Shiki) → 自定义组件
-```
-
-- 数据库始终存储**纯 Markdown**，无编辑器 HTML 泄漏
-- 代码块语言标注完整保留（Turndown 自定义规则）
-- LaTeX 反斜杠双向归一化保护
+| Layer | Technology |
+|-------|------------|
+| Framework | Next.js 16 (App Router + Server Components) |
+| Language | TypeScript 5 |
+| Database | Supabase (PostgreSQL + RLS + Storage) |
+| Auth | Supabase Auth (email/password) |
+| Styling | Tailwind CSS v4 + shadcn/ui (base-nova) |
+| Rich Text | TipTap (StarterKit + CodeBlockLowlight + Mathematics + Image) |
+| Markdown | react-markdown + rehype-pretty-code (Shiki) + KaTeX |
+| Comments | Waline (self-hosted on Vercel) |
+| Animation | Framer Motion + tw-animate-css |
+| Toast | Sonner |
 
 ---
 
-## 快速开始
+## 📦 Prerequisites
 
-### 1. 安装依赖
+- **Node.js** ≥ 18
+- **npm** ≥ 10
+- A **Supabase** account (free tier works)
+- (Optional) A **Waline** server for comments — see [Deployment](#-deployment) below
+
+---
+
+## 🚀 Quick Start (Local Development)
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/SunnyDay2333/blog.git
+cd blog
+```
+
+### 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 2. 配置环境变量
+### 3. Set up Supabase
 
-复制 `.env.example` 为 `.env.local`，填入 Supabase 项目凭据：
+1. Create a project at [supabase.com](https://supabase.com)
+2. Go to **Dashboard → SQL Editor** and run the migration files **in order**:
 
-```env
-# Supabase（来自 Dashboard → Settings → API）
-NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJxxx...
-SUPABASE_SERVICE_ROLE_KEY=eyJxxx...
+   | Order | File | Purpose |
+   |-------|------|---------|
+   | 1 | `supabase/migrations/001_initial_schema.sql` | Tables, triggers, RLS policies |
+   | 2 | `supabase/migrations/002_article_covers_storage.sql` | Cover image storage bucket |
+   | 3 | `supabase/migrations/003_article_images_storage.sql` | Article image storage bucket |
+   | 4 | `supabase/migrations/004_moments.sql` | Moments table |
 
-# Waline 评论系统
-NEXT_PUBLIC_WALINE_SERVER=https://xxx.vercel.app
+3. Go to **Dashboard → Settings → API**, copy your project URL and keys
 
-# OAuth（可选）
-GITHUB_CLIENT_ID=xxx
-GITHUB_CLIENT_SECRET=xxx
+### 4. Configure environment
+
+```bash
+cp .env.example .env.local
 ```
 
-### 3. 初始化数据库
+Edit `.env.local` and fill in your credentials:
 
-在 Supabase Dashboard → SQL Editor 中依次执行：
+```env
+# ── Supabase ────────────────────────────────────────────
+# From Supabase Dashboard → Settings → API
+NEXT_PUBLIC_SUPABASE_URL=https://<your-project>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJI...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJI...
 
-1. `supabase/migrations/001_initial_schema.sql` — 创建表、触发器、RLS 策略
-2. `supabase/migrations/002_article_covers_storage.sql` — 创建封面图存储桶
+# ── Site Metadata ───────────────────────────────────────
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_NAME=My Blog
 
-### 4. 启动开发服务器
+# ── Waline Comments ─────────────────────────────────────
+# Set this to your Waline server URL (see Deployment section below)
+NEXT_PUBLIC_WALINE_SERVER_URL=https://your-waline-server.vercel.app
+```
+
+### 5. Start the dev server
 
 ```bash
 npm run dev
 ```
 
-访问 `http://localhost:3000` 查看前台，`http://localhost:3000/admin` 进入后台。
+Open [http://localhost:3000](http://localhost:3000) for the public site, [http://localhost:3000/admin](http://localhost:3000/admin) for the admin dashboard.
+
+### 6. Create an admin account
+
+Register a user via Supabase Auth (you can use the **Supabase Dashboard → Authentication → Add User** to create your first admin account). The `handle_new_user()` trigger in migration `001` will automatically create the corresponding `profiles` row.
 
 ---
 
-## 项目结构
+## 🚢 Deployment
+
+### Option A: Deploy to a VPS (Recommended)
+
+This guide uses **Ubuntu 22.04** with Nginx as reverse proxy and PM2 as process manager.
+
+#### A1. Server Setup
+
+```bash
+# Install Node.js 22 (via NodeSource)
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Install PM2 globally
+sudo npm install -g pm2
+
+# Install Nginx
+sudo apt-get install -y nginx
+
+# Verify
+node --version   # ≥ 22
+npm --version    # ≥ 10
+pm2 --version
+nginx -v
+```
+
+#### A2. Clone and Build
+
+```bash
+# Clone the project
+sudo mkdir -p /opt/blog
+sudo chown $USER:$USER /opt/blog
+git clone https://github.com/SunnyDay2333/blog.git /opt/blog
+cd /opt/blog
+
+# Install and build
+npm install
+cp .env.example .env.local
+# ⚠️ Edit .env.local with your production values (see below)
+nano .env.local
+npm run build
+```
+
+Production `.env.local` example:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://<your-project>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJI...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJI...
+NEXT_PUBLIC_SITE_URL=https://yourdomain.com
+NEXT_PUBLIC_SITE_NAME=My Blog
+NEXT_PUBLIC_WALINE_SERVER_URL=https://yourdomain.com/api/waline
+```
+
+#### A3. Configure Nginx
+
+Create `/etc/nginx/sites-available/blog`:
+
+```nginx
+# HTTP → HTTPS redirect
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+    return 301 https://yourdomain.com$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name yourdomain.com;
+
+    ssl_certificate     /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+
+    # Next.js app
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+    # Waline reverse proxy (if using the bundled proxy, see A4)
+    location /api/waline/ {
+        proxy_pass http://127.0.0.1:8360/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name www.yourdomain.com;
+
+    ssl_certificate     /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+
+    return 301 https://yourdomain.com$request_uri;
+}
+```
+
+Enable the site and obtain SSL certificates:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/blog /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+
+# Install certbot and get free HTTPS cert
+sudo apt-get install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+```
+
+#### A4. Set Up Waline Reverse Proxy (Important)
+
+If your Waline server is deployed on a different domain, you need a reverse proxy to avoid CORS issues and enable OAuth login.
+
+Create `~/proxy.js` on the server:
+
+```js
+const http = require("http");
+const https = require("https");
+
+const WALINE_HOST = "your-waline-server.vercel.app";
+const PROXY_DOMAIN = "yourdomain.com";
+const PROXY_PATH = "/api/waline";
+
+const server = http.createServer((req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Headers", "*");
+  res.setHeader("Access-Control-Allow-Methods", "*");
+
+  if (req.method === "OPTIONS") {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  const chunks = [];
+  req.on("data", (c) => chunks.push(c));
+  req.on("end", () => {
+    const body = Buffer.concat(chunks);
+
+    // Forward critical headers (cookies needed for OAuth login)
+    const fwdHeaders = {
+      "Content-Type": req.headers["content-type"] || "application/json",
+      "Content-Length": body.length,
+      "User-Agent": req.headers["user-agent"] || "Mozilla/5.0 WalineProxy",
+      Accept: req.headers["accept"] || "*/*",
+    };
+    if (req.headers.cookie) fwdHeaders["Cookie"] = req.headers.cookie;
+    if (req.headers.authorization) fwdHeaders["Authorization"] = req.headers.authorization;
+
+    const proxy = https.request({
+      hostname: WALINE_HOST,
+      port: 443,
+      path: req.url,
+      method: req.method,
+      headers: fwdHeaders,
+    }, (proxyRes) => {
+      const headers = { ...proxyRes.headers };
+      const isHTML = (headers["content-type"] || "").includes("text/html");
+
+      // Rewrite OAuth callback URLs to go through the proxy
+      if (headers.location) {
+        headers.location = headers.location.replace(
+          new RegExp(WALINE_HOST.replace(/\./g, "\\."), "g"),
+          PROXY_DOMAIN + PROXY_PATH
+        );
+      }
+
+      if (!isHTML) {
+        res.writeHead(proxyRes.statusCode, headers);
+        proxyRes.pipe(res);
+        return;
+      }
+
+      const bufs = [];
+      proxyRes.on("data", (c) => bufs.push(c));
+      proxyRes.on("end", () => {
+        let html = Buffer.concat(bufs).toString("utf-8");
+        html = html.replace(
+          /window\.serverURL\s*=\s*['"][^'"]*['"]/,
+          `window.serverURL = 'https://${PROXY_DOMAIN}${PROXY_PATH}/api/'`
+        );
+        html = html.replace(
+          new RegExp(WALINE_HOST.replace(/\./g, "\\."), "g"),
+          PROXY_DOMAIN + PROXY_PATH
+        );
+        const newBody = Buffer.from(html, "utf-8");
+        headers["content-length"] = String(newBody.length);
+        delete headers["transfer-encoding"];
+        res.writeHead(proxyRes.statusCode, headers);
+        res.end(newBody);
+      });
+    });
+
+    proxy.on("error", () => {
+      res.writeHead(502);
+      res.end(JSON.stringify({ error: "Proxy error" }));
+    });
+
+    proxy.write(body);
+    proxy.end();
+  });
+});
+
+server.listen(8360, "127.0.0.1", () => {
+  console.log("Waline proxy running on http://127.0.0.1:8360");
+});
+```
+
+Start the proxy with PM2:
+
+```bash
+pm2 start ~/proxy.js --name waline-proxy
+pm2 save
+```
+
+#### A5. Start and Persist
+
+```bash
+# Start the Next.js app
+cd /opt/blog
+pm2 start npm --name blog -- start
+
+# Save PM2 process list and enable startup
+pm2 save
+pm2 startup
+# Follow the printed instructions to enable PM2 on boot
+```
+
+#### A6. Update the Deployed App
+
+```bash
+cd /opt/blog
+git pull origin main
+npm install          # if dependencies changed
+npm run build
+pm2 restart blog
+```
+
+### Option B: Deploy to Vercel / Netlify
+
+This project is compatible with Vercel and Netlify. However, you **must** set all `NEXT_PUBLIC_*` environment variables in the platform dashboard, and you will still need a Supabase project and a Waline server.
+
+---
+
+## 🏗️ Project Structure
 
 ```
 src/
 ├── app/
-│   ├── layout.tsx              # 根布局（字体 + 主题 + Sonner Toast）
-│   ├── page.tsx                # 首页（Hero + 时间线列表）
-│   ├── about/                  # 关于页
+│   ├── layout.tsx                 # Root layout (fonts + theme + toast)
+│   ├── page.tsx                   # Homepage (hero + timeline)
+│   ├── about/                     # About page
 │   ├── posts/
-│   │   ├── page.tsx            # 文章归档列表
-│   │   └── [slug]/page.tsx     # 文章详情页
+│   │   ├── page.tsx               # Article archive
+│   │   └── [slug]/page.tsx        # Article detail page
+│   ├── moments/                   # Moments (micro-blog)
 │   ├── admin/
-│   │   ├── layout.tsx          # Admin 布局（侧边栏 + AuthGuard）
-│   │   ├── page.tsx            # 仪表盘
-│   │   ├── login/              # 登录页
-│   │   ├── posts/              # 文章管理列表
-│   │   ├── posts/new/          # 新建文章
-│   │   ├── posts/[id]/edit/    # 编辑文章
-│   │   └── settings/           # 设置页
-│   └── globals.css             # 全局样式（含 TipTap 编辑器 + 前台代码块）
+│   │   ├── layout.tsx             # Admin layout (sidebar + AuthGuard)
+│   │   ├── page.tsx               # Dashboard
+│   │   ├── login/                 # Login page
+│   │   ├── posts/                 # Article management
+│   │   ├── posts/new/             # Create new article
+│   │   ├── posts/[id]/edit/       # Edit article
+│   │   ├── moments/               # Moments management
+│   │   └── settings/              # Settings
+│   └── globals.css                # Global styles
 ├── components/
-│   ├── admin/                  # 管理端组件
-│   │   ├── markdown-editor.tsx  # TipTap 编辑器（核心 700+ 行）
-│   │   ├── post-editor.tsx      # 文章编辑页面容器
-│   │   └── ...
-│   ├── posts/                  # 前台文章组件
-│   │   ├── post-content.tsx     # Markdown → JSX 渲染引擎
-│   │   ├── post-toc.tsx         # ToC 目录导航
-│   │   └── ...
-│   ├── comments/waline.tsx     # Waline 评论客户端组件
-│   ├── layout/                 # 公共布局（Header / Footer / Sidebar）
-│   ├── theme/                  # 主题切换（ThemeProvider / ThemeToggle）
-│   └── ui/                     # shadcn/ui 基础组件
+│   ├── admin/                     # Admin components (editor, auth-guard, etc.)
+│   ├── posts/                     # Public post components (content, ToC, etc.)
+│   ├── moments/                   # Moment card components
+│   ├── comments/waline.tsx        # Waline comment widget
+│   ├── layout/                    # Shared layout (Header, Footer, Sidebar)
+│   ├── theme/                     # Theme provider and toggle
+│   └── ui/                        # shadcn/ui primitives
 ├── lib/
-│   ├── supabase/               # Supabase 客户端（client / server / admin）
-│   ├── services/               # 服务层（post-service / auth-service）
-│   └── utils/                  # 工具函数（slug / date）
-├── hooks/                      # 自定义 Hooks
-├── types/                      # TypeScript 类型定义
-└── proxy.ts                    # Admin 路由认证中间件
+│   ├── supabase/                  # Supabase clients (browser / server / admin)
+│   ├── services/                  # Service layer (post, auth, moment)
+│   └── utils/                     # Utility functions (cn, slug, date)
+├── hooks/                         # Custom React hooks
+├── types/                         # TypeScript type definitions
+└── proxy.ts                       # Admin route auth guard (Next.js 16 Proxy)
+supabase/
+└── migrations/                    # Database migration SQL files
 ```
+
+### Three Supabase Clients
+
+| Client | File | Use Case |
+|--------|------|----------|
+| Browser | `src/lib/supabase/client.ts` | Client Components only |
+| Server | `src/lib/supabase/server.ts` | Server Components & Route Handlers |
+| Admin | `src/lib/supabase/admin.ts` | Server-only; uses `SERVICE_ROLE_KEY` to bypass RLS |
+
+### Markdown Data Flow
+
+```
+Save: Editor → getHTML() → Turndown → Pure Markdown → Supabase
+Load: Supabase → Markdown → marked → TipTap setContent()
+Display: Supabase → KaTeX pre-render → react-markdown + Shiki → Custom Components
+```
+
+The database always stores **pure Markdown** — no editor HTML ever leaks into storage.
 
 ---
 
-## 许可
+## 📄 License
 
-MIT
+MIT © Sunnyday — feel free to use, modify, and deploy your own instance.
+
+---
+
+<p align="center">
+  Made with ☕️ and lots of late-night coding
+</p>
