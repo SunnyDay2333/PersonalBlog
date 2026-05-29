@@ -17,14 +17,17 @@ import rehypeRaw from "rehype-raw";
 import rehypePrettyCode from "rehype-pretty-code";
 import katex from "katex";
 import type { ComponentProps, ReactNode } from "react";
-import { PDFEmbed, CustomImage, CopyButton, CodeThemeSync } from "./post-content-client";
+import { PDFEmbed, CustomImage, CopyButton } from "./post-content-client";
 
 // ============================================================
-// Shiki 配置
-// 使用单主题，亮/暗模式样式通过 CSS 变量切换
+// Shiki 配置 — 双主题：亮/暗模式自动切换
+// token 输出 --shiki-light / --shiki-dark CSS 变量，CSS 负责切换
 // ============================================================
 const prettyCodeOptions = {
-  theme: "github-light",
+  theme: {
+    light: "github-light",
+    dark: "github-dark-dimmed",
+  },
   keepBackground: false,
   defaultLang: "plaintext",
 };
@@ -285,7 +288,6 @@ export function PostContent({ content }: PostContentProps) {
 
   return (
     <div className="prose-custom">
-      <CodeThemeSync />
       <MarkdownAsync
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[

@@ -5,69 +5,9 @@
 // 这些组件需要浏览器 API（clipboard 等），必须在客户端运行
 // ============================================================
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import type { ComponentProps } from "react";
 import { Check, Copy } from "lucide-react";
-
-// ============================================================
-// Shiki token 颜色 — 亮/暗模式映射表
-// github-dark-dimmed 的 RGB 值
-// ============================================================
-// github-dark-dimmed 的主要 RGB 值
-const DARK_TOKEN_COLORS = [
-  "#79c0ff", "#ff7b72", "#a5d6ff", "#d2a8ff",
-  "#ffa657", "#7ee787", "#c9d1d9", "#8b949e",
-  "#388bfd",
-];
-
-// github-light 的对应 RGB 值
-const LIGHT_TOKEN_COLORS = [
-  "#005cc5", "#d73a49", "#032f62", "#6f42c1",
-  "#e36209", "#22863a", "#24292e", "#6a737d",
-  "#005cc5",
-];
-
-function applyCodeTokenColors(isDark: boolean) {
-  if (typeof document === "undefined") return;
-  const tokens = document.querySelectorAll<HTMLElement>(
-    "[data-rehype-pretty-code-figure] [style*='color:'] span"
-  );
-  const darkColors = isDark ? DARK_TOKEN_COLORS : LIGHT_TOKEN_COLORS;
-  tokens.forEach((span) => {
-    const style = span.getAttribute("style") ?? "";
-    darkColors.forEach((color) => {
-      if (style.includes(color)) {
-        span.style.color = color;
-      }
-    });
-  });
-}
-
-// ============================================================
-// 代码块主题同步器（Client Component）
-// 监听 html[data-theme] 变化，动态替换 Shiki inline token 颜色
-// ============================================================
-function CodeThemeSync() {
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      const isDark = document.documentElement.dataset.theme === "dark";
-      applyCodeTokenColors(isDark);
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-
-    // 初始化：当前主题色
-    const isDark = document.documentElement.dataset.theme === "dark";
-    applyCodeTokenColors(isDark);
-
-    return () => observer.disconnect();
-  }, []);
-
-  return null;
-}
 
 // ============================================================
 // 复制按钮
@@ -155,4 +95,4 @@ function CustomImage(props: ComponentProps<"img">) {
   );
 }
 
-export { CopyButton, PDFEmbed, CustomImage, CodeThemeSync };
+export { CopyButton, PDFEmbed, CustomImage };

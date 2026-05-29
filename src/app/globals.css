@@ -363,6 +363,24 @@ html[data-theme="dark"] .codeblock__copy:hover {
 }
 
 /* ============================================================
+   Shiki 双主题切换 — --shiki-light / --shiki-dark
+   亮色模式默认使用 --shiki-light 变量，暗色模式切换为 --shiki-dark
+   ============================================================ */
+.codeblock__code-col pre span {
+  color: var(--shiki-light);
+  font-weight: var(--shiki-light-font-weight);
+  font-style: var(--shiki-light-font-style);
+  text-decoration: var(--shiki-light-text-decoration);
+}
+
+html.dark .codeblock__code-col pre span {
+  color: var(--shiki-dark);
+  font-weight: var(--shiki-dark-font-weight);
+  font-style: var(--shiki-dark-font-style);
+  text-decoration: var(--shiki-dark-text-decoration);
+}
+
+/* ============================================================
    旧 .code-card 样式（保留兼容，未使用，可后续清理）
    ============================================================ */
 
