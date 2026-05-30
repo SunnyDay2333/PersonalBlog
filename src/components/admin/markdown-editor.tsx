@@ -906,9 +906,9 @@ export function MarkdownEditor({ content, onChange }: MarkdownEditorProps) {
   }
 
   return (
-    <div className="w-full overflow-hidden rounded-2xl border border-border bg-card">
-      {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-0.5 border-b border-border px-3 py-2">
+    <div className="w-full rounded-2xl border border-border bg-card">
+      {/* Toolbar — sticky 吸附顶部，长文滚动时始终可见 */}
+      <div className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 border-b border-border bg-card px-3 py-2 rounded-t-2xl">
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           active={editor.isActive("bold")}
