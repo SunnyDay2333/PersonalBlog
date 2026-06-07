@@ -147,7 +147,7 @@ export function PostToc({ content }: PostTocProps) {
       {/* 列表 */}
       <div
         ref={listRef}
-        className="relative pr-1"
+        className="relative max-h-[calc(100vh-19rem)] overflow-y-auto pr-1"
         style={{ scrollbarWidth: "thin" }}
       >
         <nav className="relative flex flex-col gap-0.5 pl-4">

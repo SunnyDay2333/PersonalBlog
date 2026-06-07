@@ -115,7 +115,7 @@ export default async function PostPage({
 
             {/* 右 — TOC 目录 + 最近发布（仅桌面端） */}
             <div className="hidden lg:block">
-              <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
+              <div className="sticky top-20 max-h-[calc(100vh-6rem)]">
                 <PostToc content={post.content} />
                 <RecentPosts excludeSlug={post.slug} />
               </div>
