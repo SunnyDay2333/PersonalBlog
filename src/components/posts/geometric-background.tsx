@@ -43,21 +43,6 @@ export function GeometricBackground() {
       {/* 底部淡渐变线 */}
       <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
-      {/* SVG 几何线条装饰 */}
-      <svg
-        className="absolute bottom-0 right-0 h-64 w-64 text-foreground/[0.04]"
-        viewBox="0 0 200 200"
-        fill="none"
-      >
-        <circle cx="100" cy="100" r="80" stroke="currentColor" strokeWidth="1" />
-        <circle cx="100" cy="100" r="60" stroke="currentColor" strokeWidth="1" />
-        <circle cx="100" cy="100" r="40" stroke="currentColor" strokeWidth="1" />
-        <path
-          d="M 20 100 L 180 100 M 100 20 L 100 180"
-          stroke="currentColor"
-          strokeWidth="1"
-        />
-      </svg>
     </div>
   );
 }
