@@ -131,7 +131,7 @@ export function PostToc({ content }: PostTocProps) {
       transition={{ duration: 0.5, delay: 0.3 }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="sticky top-20 h-fit max-h-[calc(100vh-6rem)]"
+      className="h-fit"
     >
       {/* 头部 */}
       <div className="mb-4 flex items-center gap-2 px-1">
@@ -147,7 +147,7 @@ export function PostToc({ content }: PostTocProps) {
       {/* 列表 */}
       <div
         ref={listRef}
-        className="relative max-h-[calc(100vh-10rem)] overflow-y-auto pr-1"
+        className="relative pr-1"
         style={{ scrollbarWidth: "thin" }}
       >
         <nav className="relative flex flex-col gap-0.5 pl-4">
