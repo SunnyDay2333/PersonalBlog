@@ -10,6 +10,7 @@ import { PublicFooter } from "@/components/layout/public-footer";
 import { PostContent } from "@/components/posts/post-content";
 import { PostHeader } from "@/components/posts/post-header";
 import { PostToc } from "@/components/posts/post-toc";
+import { RecentPosts } from "@/components/posts/recent-posts";
 import { GeometricBackground } from "@/components/posts/geometric-background";
 import { ScrollToTopButton } from "@/components/posts/scroll-to-top-button";
 import { WalineComment } from "@/components/comments/waline";
@@ -112,9 +113,10 @@ export default async function PostPage({
               <WalineComment path={`/posts/${post.slug}`} />
             </article>
 
-            {/* 右 — TOC 目录侧栏（仅桌面端） */}
+            {/* 右 — TOC 目录 + 最近发布（仅桌面端） */}
             <div className="hidden lg:block">
               <PostToc content={post.content} />
+              <RecentPosts excludeSlug={post.slug} />
             </div>
           </div>
         </div>
