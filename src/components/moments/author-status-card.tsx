@@ -14,7 +14,7 @@ interface AuthorStatusCardProps {
 
 const AVATAR_URL = "https://avatars.githubusercontent.com/u/144646414?v=4";
 const DISPLAY_NAME = "自然晴";
-const BIO = "用代码和文字记录生活的点滴";
+const BIO = "一些日常分享...";
 
 export function AuthorStatusCard({ momentCount, compact }: AuthorStatusCardProps) {
   // compact 模式 — 移动端水平一行的作者信息条
