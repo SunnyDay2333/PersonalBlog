@@ -3,6 +3,7 @@
 // ============================================================
 
 import Link from "next/link";
+import { ArrowRight, BookOpenText, MessageCircle } from "lucide-react";
 import { PublicHeader } from "@/components/layout/public-header";
 import { PublicFooter } from "@/components/layout/public-footer";
 import { PostTimelineEnhanced } from "@/components/posts/post-timeline-enhanced";
@@ -13,6 +14,46 @@ import type { Post } from "@/types/post";
 import type { MomentWithImages } from "@/types/moment";
 
 export const revalidate = 60;
+
+function SectionHeader({
+  eyebrow,
+  title,
+  description,
+  href,
+  linkLabel,
+  icon: Icon,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  href: string;
+  linkLabel: string;
+  icon: typeof BookOpenText;
+}) {
+  return (
+    <div className="mb-8 flex flex-col gap-4 border-b border-border/70 pb-5 sm:flex-row sm:items-end sm:justify-between">
+      <div className="max-w-xl">
+        <div className="mb-3 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <Icon className="h-3.5 w-3.5 text-[#425AEF]" />
+          {eyebrow}
+        </div>
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          {title}
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          {description}
+        </p>
+      </div>
+      <Link
+        href={href}
+        className="group inline-flex w-fit items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm font-medium text-foreground transition-all hover:-translate-y-0.5 hover:border-[#425AEF]/40 hover:text-[#425AEF]"
+      >
+        {linkLabel}
+        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+      </Link>
+    </div>
+  );
+}
 
 async function getPublishedPosts(): Promise<Post[]> {
   const { createClient } = await import("@/lib/supabase/server");
@@ -53,72 +94,49 @@ export default async function HomePage() {
       <main className="flex-1">
         <HeroSection />
 
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-
-          {/* ===== 最近文章 — 时间线 ===== */}
-          <div className="mb-10 flex items-center gap-4">
-            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
-            <h2 className="shrink-0 text-sm font-medium tracking-wide text-muted-foreground uppercase">
-              最近文章
-            </h2>
-            <span className="relative h-px flex-1 overflow-hidden bg-gradient-to-r from-transparent via-border to-transparent">
-              <span className="absolute inset-0 -translate-x-full animate-divider-shimmer bg-gradient-to-r from-transparent via-[#425AEF]/50 to-transparent" />
-            </span>
-          </div>
-
-          {posts.length === 0 ? (
-            <EmptyState
-              title="还没有文章"
-              description="博主正在酝酿灵感，敬请期待。"
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+          <section>
+            <SectionHeader
+              eyebrow="Latest writing"
+              title="最近文章"
+              description="把技术学习、项目实践和一些慢慢想清楚的问题，整理成可以回看的文字。"
+              href="/posts"
+              linkLabel="全部文章"
+              icon={BookOpenText}
             />
-          ) : (
-            <>
+
+            {posts.length === 0 ? (
+              <EmptyState
+                title="还没有文章"
+                description="博主正在酝酿灵感，敬请期待。"
+              />
+            ) : (
               <PostTimelineEnhanced posts={posts} />
-              <div className="mt-10 flex justify-end">
-                <Link
-                  href="/posts"
-                  className="inline-flex items-center gap-1 text-[13px] font-medium text-[#425AEF] transition-all hover:gap-2"
-                >
-                  查看全部文章
-                  <span className="text-base leading-none">→</span>
-                </Link>
-              </div>
-            </>
-          )}
+            )}
+          </section>
 
-          {/* ===== 最近说说 — 横向卡片栏 ===== */}
-          <div className="mt-16 mb-10 flex items-center gap-4">
-            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
-            <h2 className="shrink-0 text-sm font-medium tracking-wide text-muted-foreground uppercase">
-              最近说说
-            </h2>
-            <span className="relative h-px flex-1 overflow-hidden bg-gradient-to-r from-transparent via-border to-transparent">
-              <span className="absolute inset-0 -translate-x-full animate-divider-shimmer bg-gradient-to-r from-transparent via-[#425AEF]/50 to-transparent" />
-            </span>
-          </div>
+          <section className="mt-20">
+            <SectionHeader
+              eyebrow="Moments"
+              title="最近说说"
+              description="短句、照片和当下的碎片，保留一点未经精修的生活温度。"
+              href="/moments"
+              linkLabel="全部说说"
+              icon={MessageCircle}
+            />
 
-          {moments.length === 0 ? (
-            <p className="py-8 text-center text-[14px] text-muted-foreground">
-              还没有说说，这里空空如也～。
-            </p>
-          ) : (
-            <>
-              <div className="-mx-2 flex gap-4 overflow-x-auto px-2 pb-2 snap-x snap-mandatory scrollbar-none">
+            {moments.length === 0 ? (
+              <p className="rounded-md border border-dashed border-border py-10 text-center text-sm text-muted-foreground">
+                还没有说说，这里空空如也～。
+              </p>
+            ) : (
+              <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-3 snap-x snap-mandatory scrollbar-none">
                 {moments.map((m) => (
                   <MomentMiniCard key={m.id} moment={m} />
                 ))}
               </div>
-              <div className="mt-10 flex justify-end">
-                <Link
-                  href="/moments"
-                  className="inline-flex items-center gap-1 text-[13px] font-medium text-[#425AEF] transition-all hover:gap-2"
-                >
-                  查看全部说说
-                  <span className="text-base leading-none">→</span>
-                </Link>
-              </div>
-            </>
-          )}
+            )}
+          </section>
         </div>
       </main>
 
